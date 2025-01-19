@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/app.js"
+    }
+  ],
+  "env": {
+    "JWT": "gfahafkjhfjyrh4774qf7yq-84759w9489gh@98070009214!@#$%^&*()_+-=",
+    "MONGODB_URI": "mongodb+srv://rupeshrauniyar80:1000crCompanySoon@mistri.etee7.mongodb.net/MistriDB?retryWrites=true&w=majority&appName=Mistri",
+    "FRONTEND_URL": "https://mistri-user.vercel.app",
+    "MISTRI_FRONTEND_URL": "https://mistri-drab.vercel.app"
+  }
+}
