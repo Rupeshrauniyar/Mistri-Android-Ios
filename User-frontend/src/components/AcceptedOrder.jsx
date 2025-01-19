@@ -113,8 +113,8 @@ const AcceptedOrder = (props) => {
     }
   };
   useEffect(() => {
-    getPermissionAndWatchPositionForMobile();
-    // getPermissionAndWatchPositionForWeb();
+    // getPermissionAndWatchPositionForMobile();
+    getPermissionAndWatchPositionForWeb();
   }, []);
 
   useEffect(() => {
