@@ -5,10 +5,10 @@ export const AuthProvider = ({children}) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [mistri, setMistri] = useState(null);
   const [mistriLoading, setMistriLoading] = useState(true);
-  useEffect(() => {
+  useEffect(async () => {
     const token = localStorage.getItem("token");
     if (token) {
-      axios.post(`${backendUrl}/mistri/check`, {token}).then((response) => {
+      await axios.post(`${backendUrl}/mistri/check`, {token}).then((response) => {
         if (response.data.status === "OK" && response.data.mistri) {
           setMistri(response.data.mistri);
         } else {
@@ -21,5 +21,5 @@ export const AuthProvider = ({children}) => {
     setMistriLoading(false);
   }, []);
 
-  return <mistriContext.Provider value={{mistri, setMistri, mistriLoading,setMistriLoading}}> {children} </mistriContext.Provider>;
+  return <mistriContext.Provider value={{mistri, setMistri, mistriLoading, setMistriLoading}}> {children} </mistriContext.Provider>;
 };

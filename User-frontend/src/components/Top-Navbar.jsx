@@ -1,5 +1,6 @@
 import React, {useContext} from "react";
 import {userContext} from "../context/Auth.context";
+import { Link } from "react-router-dom";
 const TopNavbar = () => {
   const {user} = useContext(userContext);
   return (
@@ -14,17 +15,34 @@ const TopNavbar = () => {
             className="xl:ml-1 mr-2 p-1 rounded-full object-cover bg-zinc-200 border-2 xl:w-10 xl:h-10 sm:w-8 sm:h-8 cursor-pointer"
             alt=""
           />
-          {user ? <p>{user.username}</p> : <p>loading...</p>}
+          {user ? <p>{user.username}</p> : <p className="text-red-500">Guest</p>}
         </div>
 
-        <svg
-          className="w-8 h-8 cursor-pointer"
-          focusable="false"
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          data-testid="MenuOpenRoundedIcon">
-          <path d="M4 18h11c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1m0-5h8c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1M3 7c0 .55.45 1 1 1h11c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1m17.3 7.88L17.42 12l2.88-2.88c.39-.39.39-1.02 0-1.41a.996.996 0 0 0-1.41 0L15.3 11.3c-.39.39-.39 1.02 0 1.41l3.59 3.59c.39.39 1.02.39 1.41 0 .38-.39.39-1.03 0-1.42"></path>
-        </svg>
+        <div className="flex items-center justify-center">
+          <Link to="/search" className="flex">
+            <span className="bg-zinc-100 rounded-full p-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                className="w-5 h-5">
+                <path
+                  fillRule="evenodd"
+                  d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </span>
+          </Link>
+
+          <svg
+            className="w-5 h-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor">
+            <path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"></path>
+          </svg>
+        </div>
       </div>
     </>
   );

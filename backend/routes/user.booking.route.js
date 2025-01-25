@@ -6,7 +6,7 @@ const userBookingController = require("../controllers/user.booking.controller")
 
 
 router.post("/confirm", userBookingController.confirmBooking)
-router.post("/", userBookingController.getBookings)
+router.post("/fetch/active", userBookingController.getActiveBookings)
 router.post("/create", userBookingController.createBooking)
 
 

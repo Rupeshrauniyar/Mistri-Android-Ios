@@ -12,10 +12,10 @@ const IsLoggedin = () => {
     } else if (!mistriLoading && !mistri) {
       navigate("/login");
     }
-  }, [mistri, setMistri]);
+  }, [mistri]);
 
   if (mistriLoading) {
-    return <div>Loading...</div>; // You can also customize the loading UI here
+    return; // You can also customize the loading UI here
   }
 
   return mistri && mistri !== null ? <Outlet /> : null; // Avoid rendering if mistri is not logged in

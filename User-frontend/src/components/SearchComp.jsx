@@ -1,14 +1,16 @@
 import React from "react";
-
-const Search = () => {
+import {Link} from "react-router-dom";
+const SearchComp = (props) => {
   return (
     <div className="flex w-full h-[10%]">
       <div className="flex items-center justify-start  w-full  h-full">
         <label className="flex items-center gap-2 w-full h-[40px] px-2 bg-white  rounded-md overflow-hidden">
           <input
             type="text"
+            onChange={(e) => props.fnc(e.target.value)}
             className="grow h-full border-none outline-none bg-white"
             placeholder="Search"
+            // disabled={true}
           />
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -27,4 +29,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default SearchComp;

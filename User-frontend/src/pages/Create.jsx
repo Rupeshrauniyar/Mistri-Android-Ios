@@ -7,31 +7,34 @@ const Create = () => {
   const [Data, setData] = useState([]);
 
   const {user, userLoading} = useContext(userContext);
+  useEffect(() => {
+    setData((prev) => ({
+      ...prev,
+      user: user._id,
+    }));
+  }, [user]);
   const createOrder = async (data) => {
-    if (!userLoading) {
-      setData((prev) => ({
-        ...prev,
-        user: user._id,
-      }));
-      await axios
-        .post(`${backendURL}/user/booking/create`, data, {
-          headers: {Authorization: `Bearer ${user.token}`},
-        })
-        .then((res) => {
-          console.log(res);
-          if ((res.status === "BAD", !res.data.order)) {
-            toast.error("Something went wrong...");
-          } else if ((res.status === "OK", res.data.order)) {
-            toast.success("Order Created Successfully");
-          } else {
-            toast.error("Failed to Create Order");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Failed to Create Order");
-        });
+    if(!data && !Data.user){
+      return toast.error("Something went wrong.Please try again.")
     }
+    await axios
+      .post(`${backendURL}/user/booking/create`, data, {
+        headers: {Authorization: `Bearer ${user.token}`},
+      })
+      .then((res) => {
+        console.log(res);
+        if ((res.status === "BAD", !res.data.order)) {
+          toast.error("Something went wrong...");
+        } else if ((res.status === "OK", res.data.order)) {
+          toast.success("Order Created Successfully");
+        } else {
+          toast.error("Failed to Create Order");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to Create Order");
+      });
   };
   const [orderFeilds, setOrderFeilds] = useState([
     {
@@ -183,9 +186,10 @@ const Create = () => {
                   setData((prev) => ({
                     ...prev,
                     [fields.label]: e.target.value,
+                    user: user._id,
                   }))
                 }
-                className="p-2 rounded-md shadow-md w-full hover:border-blue-500 outline-none"
+                className="p-2 rounded-md shadow-md sm:w-full xl:w-[80%] hover:border-blue-500 outline-none"
               />
             </span>
           ))}
@@ -198,7 +202,7 @@ const Create = () => {
                   ["Profession"]: e.target.value,
                 }))
               }
-              className="p-2 rounded-md shadow-md w-full">
+              className="p-2 rounded-md shadow-md sm:w-full xl:w-[80%]">
               <option value="">Select</option>
               {MistriOptions.map((mistri, i) =>
                 mistri.option.map((mistriOption, i) => (
@@ -212,13 +216,13 @@ const Create = () => {
             </select>
           </span>
         </div>
-        <div className="flex items-center justify-center w-full">
-          <button
-            onClick={() => createOrder(Data)}
-            className="bg-black text-white rounded-xl px-3 py-2 ">
-            Create
-          </button>
-        </div>
+        {/* <div className="flex items-center justify-center w-full"> */}
+        <button
+          onClick={() => createOrder(Data)}
+          className="bg-black text-white rounded-xl px-3 py-2 mt-2 sm:w-full xl:w-[80%] ">
+          Create
+        </button>
+        {/* </div> */}
       </div>
     </div>
   );

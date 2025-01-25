@@ -19,15 +19,19 @@ const HistoryComponent = (props) => {
       ) : (
         <div className="w-full flex flex-col">
           {History.length > 0 ? (
-            <div className="px-2 xl:py-2">
-              {History.slice().reverse().map((History) => (
-                <Orders
-                  key={History._id}
-                  orders={History}
-                />
-              ))}
+            <>
+              <div className="px-2 xl:py-2 flex flex-wrap">
+                {History.slice()
+                  .reverse()
+                  .map((History) => (
+                    <Orders
+                      key={History._id}
+                      orders={History}
+                    />
+                  ))}
+              </div>
               <h3 className="mt-4 text-center">End of the results.</h3>
-            </div>
+            </>
           ) : (
             <>
               <div className="w-full h-full flex items-center justify-center mt-10 text-2xl font-bold">No any history</div>

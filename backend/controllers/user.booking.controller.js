@@ -7,10 +7,26 @@ const orderModel = require('../models/order.model.js');
 
 require("dotenv").config();
 
-const getBookings = async (req, res) => {
+const getActiveBookings = async (req, res) => {
     const data = req.body
-    const user = await userModel.findOne({ _id: data.userId })
-    if (user) {
+    // console.log(data)
+    const order = await orderModel
+        .findOne({ _id: data.orderId })
+        .populate({
+            path: "user",
+            select: "-orders -acceptedOrder -history -password -contactName -role -email", // Unselect fields from the 'user'
+        })
+        .populate({
+            path: "mistri",
+            select: "-orders -acceptedOrder -rejectedOrders -idProof -profileImage -history -password -contactName -role -email", // Unselect fields from the 'mistri'
+        })
+    const unHashedOtp = jwt.verify(order.otp, process.env.JWT)
+    console.log(unHashedOtp)
+    order.otp = unHashedOtp
+    if (order) {
+        return res.json({ status: "OK", order })
+    } else {
+        return res.json({ status: "OK" })
 
     }
 }
@@ -19,6 +35,8 @@ const confirmBooking = async (req, res) => {
     try {
         const data = req.body;
         const user = data.user;
+        console.log(data)
+        // console.log(user)
         if (data) {
             const searchMistri = await mistriModel.findOne({ _id: data.mistriId }).populate("acceptedOrder")
             if (searchMistri.acceptedOrder.length > 0) {
@@ -91,4 +109,4 @@ const createBooking = async (req, res) => {
 
     }
 }
-module.exports = { confirmBooking, getBookings, createBooking } 
+module.exports = { confirmBooking, getActiveBookings, createBooking } 

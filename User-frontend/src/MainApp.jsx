@@ -1,7 +1,7 @@
 import {useState, useContext, useEffect} from "react";
 import {useNavigate, useLocation, BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {App} from "@capacitor/app";
-
+import {userContext} from "./context/Auth.context.jsx";
 // import IsLoggedin from "./middleware/IsLoggedin.jsx";
 import IsLoggedin from "./middleware/IsLoggedin.jsx";
 // Universal pages
@@ -22,12 +22,13 @@ import History from "./pages/History.jsx";
 import Navbar from "./components/Navbar.jsx";
 import TopNavbar from "./components/Top-Navbar.jsx";
 // import BookingsActive from "./components/BookingsActive.jsx";
+import ActiveOrders from "./pages/ActiveOrders.jsx";
 import BookingsOther from "./components/BookingsOther.jsx";
 import HistoryComponent from "./components/HistoryComponent.jsx";
 function MainApp() {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const {user, userLoading} = useContext(userContext);
   useEffect(() => {
     const handleBackButton = () => {
       if (location.pathname === "/") {
@@ -75,13 +76,17 @@ function MainApp() {
                 path="/bookings"
                 element={<Bookings />}
               />
-               <Route
+              <Route
                 path="/bookings/other"
                 element={<BookingsOther />}
               />
-               <Route
+              <Route
+                path="/bookings/active/:orderId"
+                element={<ActiveOrders />}
+              />
+              <Route
                 path="/bookings/history"
-                element={<HistoryComponent showNavbar={true}/>}
+                element={<HistoryComponent showNavbar={true} />}
               />
               <Route
                 path="/favourites"

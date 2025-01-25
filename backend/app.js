@@ -51,7 +51,7 @@ const userFavouriteRoute = require("./routes/user.favourite.route.js");
 const userBookingRoute = require("./routes/user.booking.route.js");
 const userFetchBookingMistriRoute = require("./routes/user.mistri.booking.fetch.route.js");
 const MistriOrderRoute = require("./routes/mistri.order.route.js");
-
+const userSearchRoute = require("./routes/user.search.route")
 app.use("/user", userHomeRoute);
 app.use("/mistri", mistriHomeRoute);
 app.use("/user/booking", userBookingRoute);
@@ -62,7 +62,7 @@ app.use("/user/book/fetch/mistri", userFetchBookingMistriRoute);
 app.use("/mistri/profile", mistriProfileRoute);
 app.use("/auth/mistri", mistriAuthRoute);
 app.use("/mistri/orders", MistriOrderRoute);
-
+app.use("/", userSearchRoute);
 // Start the server
 server.listen(PORT, () => {
 });

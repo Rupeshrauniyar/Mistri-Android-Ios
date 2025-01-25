@@ -25,7 +25,7 @@ const BookingsOther = () => {
               {/* <h2 className="ml-3 text-xl">Your bookings</h2> */}
               {UserOrders.length > 0 ? (
                 <>
-                  <div className="w-full min-h-[70vh] px-2 xl:py-2 flex xl:flex-row sm:flex-col">
+                  <div className="w-full min-h-[70vh] px-2 xl:py-2 flex xl:flex-row sm:flex-col flex-wrap">
                     {UserOrders.slice().reverse().map((order) => (
                       <Orders
                         orders={order}

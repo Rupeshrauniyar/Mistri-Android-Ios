@@ -12,7 +12,7 @@ import {io} from "socket.io-client";
 import {Geolocation} from "@capacitor/geolocation";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const socket = io.connect(backendUrl);
-
+import {ActiveOrdersContext} from "@/context/ActiveOrders.context";
 const AcceptedOrder = (props) => {
   const {user, setUser, setUserLoading} = useContext(userContext);
   const [userPosition, setUserPosition] = useState([0, 0]);
@@ -22,52 +22,52 @@ const AcceptedOrder = (props) => {
   const [error, setError] = useState(null);
   const permissionRequested = useRef(false); // Track if permission request has been made
   const errorDisplayed = useRef(false); // Track if error has already been displayed
+  const {activeOrders, seActiveOrdersContext} = useContext(ActiveOrdersContext);
+  // const getPermissionAndWatchPositionForMobile = async () => {
+  //   try {
+  //     if (permissionRequested.current) return; // Exit if already requested
+  //     permissionRequested.current = true;
 
-  const getPermissionAndWatchPositionForMobile = async () => {
-    try {
-      if (permissionRequested.current) return; // Exit if already requested
-      permissionRequested.current = true;
+  //     const hasPermission = await Geolocation.requestPermissions();
+  //     if (hasPermission.location === "granted") {
+  //       const watchId = Geolocation.watchPosition({enableHighAccuracy: true, timeout: 5000, maximumAge: 0}, (position, err) => {
+  //         if (err) {
+  //           if (!errorDisplayed.current) {
+  //             // Show error only once
+  //             setError("Error fetching geolocation");
+  //             toast.error("Error fetching geolocation");
+  //             errorDisplayed.current = true;
+  //           }
+  //           setPositionLoading(false);
+  //           return;
+  //         }
+  //         const {latitude, longitude} = position.coords;
+  //         setUserPosition([latitude, longitude]);
+  //         setPositionLoading(false);
+  //       });
 
-      const hasPermission = await Geolocation.requestPermissions();
-      if (hasPermission.location === "granted") {
-        const watchId = Geolocation.watchPosition({enableHighAccuracy: true, timeout: 5000, maximumAge: 0}, (position, err) => {
-          if (err) {
-            if (!errorDisplayed.current) {
-              // Show error only once
-              setError("Error fetching geolocation");
-              toast.error("Error fetching geolocation");
-              errorDisplayed.current = true;
-            }
-            setPositionLoading(false);
-            return;
-          }
-          const {latitude, longitude} = position.coords;
-          setUserPosition([latitude, longitude]);
-          setPositionLoading(false);
-        });
-
-        // Cleanup function to clear watch when component unmounts
-        return () => Geolocation.clearWatch({id: watchId});
-      } else {
-        if (!errorDisplayed.current) {
-          // Show error only once
-          // setError("Location permission denied.");
-          toast.error("Location permission denied.");
-          errorDisplayed.current = true;
-        }
-        setPositionLoading(false);
-      }
-    } catch (err) {
-      // toast.error("Failed to request location permissions.");
-      if (!errorDisplayed.current) {
-        // Show error only once
-        // setError("Failed to request location permissions.");
-        errorDisplayed.current = true;
-      }
-      setPositionLoading(false);
-      return;
-    }
-  };
+  //       // Cleanup function to clear watch when component unmounts
+  //       return () => Geolocation.clearWatch({id: watchId});
+  //     } else {
+  //       if (!errorDisplayed.current) {
+  //         // Show error only once
+  //         // setError("Location permission denied.");
+  //         toast.error("Location permission denied.");
+  //         errorDisplayed.current = true;
+  //       }
+  //       setPositionLoading(false);
+  //     }
+  //   } catch (err) {
+  //     // toast.error("Failed to request location permissions.");
+  //     if (!errorDisplayed.current) {
+  //       // Show error only once
+  //       // setError("Failed to request location permissions.");
+  //       errorDisplayed.current = true;
+  //     }
+  //     setPositionLoading(false);
+  //     return;
+  //   }
+  // };
   const getPermissionAndWatchPositionForWeb = () => {
     if (permissionRequested.current) return; // Exit if permission already requested
     permissionRequested.current = true;
@@ -97,7 +97,7 @@ const AcceptedOrder = (props) => {
           setPositionLoading(false);
           console.error("Geolocation Error:", err.message);
         },
-        {enableHighAccuracy: true, timeout: 5000, maximumAge: 0}
+        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
       );
 
       // Cleanup function to clear the watch
@@ -160,19 +160,20 @@ const AcceptedOrder = (props) => {
   const order = props.acceptedOrder;
   return (
     <>
+      {/* {console.log("props")} */}
       <div
         key={order._id}
-        className="xl:w-full xl:h-[40%] sm:w-full sm:h-[80%] shrink-0 bg-white   xl:mr-1 sm:mr-0 border-b-2">
-        <div className="Map w-full xl:h-[25%] sm:h-[45%]  overflow-hidden shrink-0">
+        className="xl:w-full xl:h-[80vh] sm:w-full sm:h-[80%] shrink-0 bg-white   xl:mr-1 sm:mr-0 border-b-2">
+        <div className="Map w-full xl:h-[55%] sm:h-[45%]  overflow-hidden shrink-0">
           {/* <Button onClick={(e) => }>Get location</Button> */}
           {positionLoading || !userPosition ? (
             <></>
           ) : (
             <MapContainer
               center={userPosition}
-              zoom={30}
+              zoom={20}
               className="w-full h-full "
-              style={{height: "40vh", width: "100vw"}} // Ensures the map takes the full available space
+              style={{width: "100vw"}} // Ensures the map takes the full available space
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -241,6 +242,7 @@ const AcceptedOrder = (props) => {
           </div>
         </div>
       </div>
+      <h3 className="text-center">End of the results...</h3>
     </>
   );
 };

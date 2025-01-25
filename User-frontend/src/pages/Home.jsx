@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from "react";
 import axios from "axios";
-import Search from "../components/Search";
+import Search from "../components/SearchComp";
 import {Link, useNavigate} from "react-router-dom";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,7 +25,6 @@ const Home = () => {
     } else {
       setMistris([mistris[0]]);
       setLoading(false);
-
     }
   }, []);
   const fetchMistris = () => {
@@ -73,7 +72,12 @@ const Home = () => {
           <h4 className="text-4xl font-black ">Discover Mistris.</h4>
           <p className="text-lg w-[90%] xl:block text-indexColor">Find best and pocket friendly Mistris.</p>
         </div>
-        <Search />
+        <Link
+          to={"/search"}
+          className="flex mt-4">
+          <Search />
+        </Link>
+
         <div className="noScroll w-full xl:h-[80%]   flex flex-wrap  ">
           {loading ? (
             <MistriSkeletonLoading />
