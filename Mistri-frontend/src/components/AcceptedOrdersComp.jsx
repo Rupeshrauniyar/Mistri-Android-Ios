@@ -70,7 +70,6 @@ const AcceptedOrderComp = (props) => {
   //   fetchOrders();
   // }, []);
 
-  
   const startOrder = (orderId, userId, mistriId) => {
     const Data = {
       userId,
@@ -142,46 +141,46 @@ const AcceptedOrderComp = (props) => {
           setError("Failed to request location permissions.");
           toast.error("Failed to request location permissions.");
           setPositionLoading(false);
-          console.log(err)
+          console.log(err);
+        }
+      };
+      const getPermissionAndWatchPositionForWeb = () => {
+        if (!navigator.geolocation) {
+          setError("Geolocation is not supported by your browser.");
+          toast.error("Geolocation is not supported by your browser.");
+          setPositionLoading(false);
+          return;
+        }
+
+        try {
+          const watchId = navigator.geolocation.watchPosition(
+            (position) => {
+              const {latitude, longitude} = position.coords;
+              setMistriPosition([latitude, longitude]);
+              setPositionLoading(false);
+            },
+            (err) => {
+              setError("Error fetching geolocation.");
+              toast.error("Error fetching geolocation.");
+              setPositionLoading(false);
+              console.error("Geolocation Error:", err.message);
+            },
+            {enableHighAccuracy: true, timeout: 5000, maximumAge: 0}
+          );
+
+          // Return a function to clear the watch when the component unmounts
+          return () => navigator.geolocation.clearWatch(watchId);
+        } catch (err) {
+          setError("Failed to access geolocation.");
+          toast.error("Failed to access geolocation.");
+          setPositionLoading(false);
+          console.error("Geolocation Error:", err.message);
         }
       };
 
-      getPermissionAndWatchPositionForMobile();
+      // getPermissionAndWatchPositionForMobile();
 
-      // const getPermissionAndWatchPositionForWeb = () => {
-      //   if (!navigator.geolocation) {
-      //     setError("Geolocation is not supported by your browser.");
-      //     toast.error("Geolocation is not supported by your browser.");
-      //     setPositionLoading(false);
-      //     return;
-      //   }
-
-      //   try {
-      //     const watchId = navigator.geolocation.watchPosition(
-      //       (position) => {
-      //         const {latitude, longitude} = position.coords;
-      //         setMistriPosition([latitude, longitude]);
-      //         setPositionLoading(false);
-      //       },
-      //       (err) => {
-      //         setError("Error fetching geolocation.");
-      //         toast.error("Error fetching geolocation.");
-      //         setPositionLoading(false);
-      //         console.error("Geolocation Error:", err.message);
-      //       },
-      //       {enableHighAccuracy: true, timeout: 5000, maximumAge: 0}
-      //     );
-
-      //     // Return a function to clear the watch when the component unmounts
-      //     return () => navigator.geolocation.clearWatch(watchId);
-      //   } catch (err) {
-      //     setError("Failed to access geolocation.");
-      //     toast.error("Failed to access geolocation.");
-      //     setPositionLoading(false);
-      //     console.error("Geolocation Error:", err.message);
-      //   }
-      // };
-      // getPermissionAndWatchPositionForWeb()
+      getPermissionAndWatchPositionForWeb()
     }
   }, []);
   useEffect(() => {
