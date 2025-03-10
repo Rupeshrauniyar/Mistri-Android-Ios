@@ -66,3 +66,18 @@ app.use("/", userSearchRoute);
 // Start the server
 server.listen(PORT, () => {
 });
+
+const autocannon = require('autocannon');
+
+// async function runTest() {
+//   const result = await autocannon({
+//     url: 'http://localhost:3000', // Change this to your server URL
+//     connections: 100,  // Number of concurrent users
+//     duration: 10,      // Duration in seconds
+//   });
+
+//   console.log(result);
+// }
+
+// runTest();
+

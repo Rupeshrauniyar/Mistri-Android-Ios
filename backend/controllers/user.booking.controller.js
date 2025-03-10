@@ -15,7 +15,7 @@ const getActiveBookings = async (req, res) => {
         .populate({
             path: "user",
             select: "-orders -acceptedOrder -history -password -contactName -role -email", // Unselect fields from the 'user'
-        })
+        }) 
         .populate({
             path: "mistri",
             select: "-orders -acceptedOrder -rejectedOrders -idProof -profileImage -history -password -contactName -role -email", // Unselect fields from the 'mistri'

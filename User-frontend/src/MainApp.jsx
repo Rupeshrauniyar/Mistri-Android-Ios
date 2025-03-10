@@ -26,9 +26,10 @@ import ActiveOrders from "./pages/ActiveOrders.jsx";
 import BookingsOther from "./components/BookingsOther.jsx";
 import HistoryComponent from "./components/HistoryComponent.jsx";
 function MainApp() {
+  const {user, userLoading} = useContext(userContext);
+
   const navigate = useNavigate();
   const location = useLocation();
-  const {user, userLoading} = useContext(userContext);
   useEffect(() => {
     const handleBackButton = () => {
       if (location.pathname === "/") {

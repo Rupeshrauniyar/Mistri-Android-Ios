@@ -6,8 +6,9 @@ require('dotenv').config()
 
 const DB = mongoose.connect(process.env.MONGODB_URI).then(function () {
     try {
-        console.log("Connected to backend.")
+        console.log("Connected to DB.")
     } catch (err) {
+        console.log(err)
     }
 })
 
