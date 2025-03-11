@@ -49,7 +49,7 @@ const Bookings = () => {
           <div className="w-full h-full flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
           </div>
-        ) : !user.bookings ? (
+        ) : !user.orders ? (
           <>
             <div className="w-full h-full flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
