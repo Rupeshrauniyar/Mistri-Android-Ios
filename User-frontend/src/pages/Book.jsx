@@ -1,296 +1,410 @@
 import React, {useContext, useEffect, useState} from "react";
-import {useParams, Link} from "react-router-dom";
+import {useParams, Link, useNavigate} from "react-router-dom";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import {userContext} from "../context/Auth.context";
 import {Button} from "@/components/ui/button";
+import FormInput from "@/components/ui/FormInput";
+import PageHeader from "@/components/ui/PageHeader";
+import {Calendar, Clock, MapPin, Phone, Mail, Home, IndianRupee, ArrowLeft, CheckCircle, Loader2, Star} from "lucide-react";
+
 const Book = () => {
+  const navigate = useNavigate();
   const {user, userLoading, setUser} = useContext(userContext);
 
-  const [mistris, setMistris] = useState([]);
+  const [mistri, setMistri] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [charges, setCharges] = useState(null);
-  const [time, setTime] = useState();
-  const [date, setDate] = useState();
+  const [time, setTime] = useState("");
+  const [date, setDate] = useState("");
 
-  const mistri = useParams();
-  const mistriId = mistri.id;
-  const userId = user._id;
+  const {id: mistriId} = useParams();
   const backendURL = import.meta.env.VITE_BACKEND_URL;
+
   useEffect(() => {
-    sendMistriRequest();
+    fetchMistriDetails();
   }, []);
-  const sendMistriRequest = () => {
-    const data = {
-      mistriId,
-    };
-    axios.post(`${backendURL}/user/book/fetch/mistri`, data).then(function (response) {
-      if (response && response.data.status === "OK" && response.data.mistri) {
-        setMistris([response.data.mistri]);
-      } else {
-        toast.error("No mistris found.");
-        setMistris(null);
-      }
-    });
+
+  const fetchMistriDetails = () => {
+    setLoading(true);
+    axios
+      .post(`${backendURL}/user/book/fetch/mistri`, {mistriId})
+      .then(function (response) {
+        if (response && response.data.status === "OK" && response.data.mistri) {
+          setMistri(response.data.mistri);
+          setCharges(response.data.mistri.charges);
+        } else {
+          toast.error("No mistri found.");
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching mistri details:", error);
+        toast.error("Failed to load mistri details. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
-  const sendConfirmBookingRequest = (e) => {
-    if (!time || !date) {
-      return toast.error("All the booking fields are required.");
-    }
-    if (!charges || charges === null) {
-      var BookingData = {
-        userId,
-        mistriId,
-        charges: mistris[0].charges,
-        time,
-        date,
-      };
-    } else {
-      var BookingData = {
-        userId,
-        mistriId,
-        charges,
-        time,
-        date,
-      };
-    }
 
-    // const mistriCharges = mistris[0].charges;
-
+  const handleConfirmBooking = (e) => {
     e.preventDefault();
-    axios.post(`${backendURL}/user/booking/confirm`, BookingData).then(function (response) {
-      if (response && response.data.status === "OK" && response.data.mistri && response.data.order && response.data.user) {
-        setUser((prev) => ({
-          ...prev,
-          orders: [...prev.orders, response.data.order],
-        }));
 
-        toast.success("Booking confirmed successfully.");
-      } else if (response && response.data.status === "BAD") {
-        toast.error(response.data.message);
-      }
-    });
+    if (!time || !date) {
+      return toast.error("Please select both date and time for your appointment.");
+    }
+
+    setSubmitting(true);
+    const bookingData = {
+      userId: user._id,
+      mistriId,
+      charges: charges || mistri.charges,
+      time,
+      date,
+    };
+
+    axios
+      .post(`${backendURL}/user/booking/confirm`, bookingData)
+      .then(function (response) {
+        if (response && response.data.status === "OK" && response.data.mistri && response.data.order && response.data.user) {
+          setUser((prev) => ({
+            ...prev,
+            orders: [...prev.orders, response.data.order],
+          }));
+          toast.success("Booking confirmed successfully!");
+          setTimeout(() => navigate("/bookings"), 2000);
+        } else if (response && response.data.status === "BAD") {
+          toast.error(response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Error confirming booking:", error);
+        toast.error("Failed to confirm booking. Please try again.");
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
 
-  const token = localStorage.getItem("token");
-  if (userLoading && !user) {
-    return <div>Loading...</div>;
+  // Loading state
+  if (userLoading || loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <Loader2 className="w-12 h-12 text-black animate-spin mb-4" />
+        <p className="text-gray-600">Loading booking details...</p>
+      </div>
+    );
   }
 
-  const userFeilds = [
+  // Check if user is logged in
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+        <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold mb-4">Login Required</h2>
+          <p className="text-gray-600 mb-6">Please login to book a service with this mistri.</p>
+          <Link to="/login">
+            <Button className="bg-black hover:bg-gray-800 text-white w-full py-6">Login to Continue</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if mistri data is available
+  if (!mistri) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+        <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold mb-4">Mistri Not Found</h2>
+          <p className="text-gray-600 mb-6">We couldn't find the mistri you're looking for.</p>
+          <Link to="/">
+            <Button className="bg-black hover:bg-gray-800 text-white w-full py-6">Back to Home</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const userFields = [
     {
       name: "email",
       value: user.email,
       disabled: true,
       label: "Email",
-      path: (
-        <path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3ZM12.0606 11.6829L5.64722 6.2377L4.35278 7.7623L12.0731 14.3171L19.6544 7.75616L18.3456 6.24384L12.0606 11.6829Z"></path>
-      ),
+      icon: <Mail className="w-5 h-5" />,
     },
     {
       name: "contactNumber",
       value: user.contactNumber,
       disabled: true,
       label: "Contact Number",
-      path: (
-        <path d="M21 16.42V19.9561C21 20.4811 20.5941 20.9167 20.0705 20.9537C19.6331 20.9846 19.2763 21 19 21C10.1634 21 3 13.8366 3 5C3 4.72371 3.01545 4.36687 3.04635 3.9295C3.08337 3.40588 3.51894 3 4.04386 3H7.5801C7.83678 3 8.05176 3.19442 8.07753 3.4498C8.10067 3.67907 8.12218 3.86314 8.14207 4.00202C8.34435 5.41472 8.75753 6.75936 9.3487 8.00303C9.44359 8.20265 9.38171 8.44159 9.20185 8.57006L7.04355 10.1118C8.35752 13.1811 10.8189 15.6425 13.8882 16.9565L15.4271 14.8019C15.5572 14.6199 15.799 14.5573 16.001 14.6532C17.2446 15.2439 18.5891 15.6566 20.0016 15.8584C20.1396 15.8782 20.3225 15.8995 20.5502 15.9225C20.8056 15.9483 21 16.1633 21 16.42Z"></path>
-      ),
+      icon: <Phone className="w-5 h-5" />,
     },
     {
       name: "address",
       value: user.address,
       disabled: true,
       label: "Address",
-      path: (
-        <path d="M18.364 17.364L12 23.7279L5.63604 17.364C2.12132 13.8492 2.12132 8.15076 5.63604 4.63604C9.15076 1.12132 14.8492 1.12132 18.364 4.63604C21.8787 8.15076 21.8787 13.8492 18.364 17.364ZM12 13C13.1046 13 14 12.1046 14 11C14 9.89543 13.1046 9 12 9C10.8954 9 10 9.89543 10 11C10 12.1046 10.8954 13 12 13Z"></path>
-      ),
+      icon: <Home className="w-5 h-5" />,
     },
   ];
+
+  const isAlreadyBooked = user && user.orders && user.orders.some((order) => order.mistri === mistri._id);
+
   return (
     <>
-      <ToastContainer />
-      {!userLoading ? (
-        <>
-          <div className="w-full h-full xl:flex xl:flex-row sm:flex-col overflow-y-auto bg-white">
-            <div className=" xl:w-full xl:h-[100%] sm:w-full sm:min-h-[140%]  shrink-0 ">
-              {mistris ? (
-                <>
-                  {mistris
-                    .slice()
-                    .reverse()
-                    .map((mistri, index) => (
-                      <div
-                        key={index}
-                        className="w-full  p-2">
-                        <div className="flex w-full h-[100px] bg-black text-white p-2 rounded-md">
-                          <div className="Image h-full  flex flex-col items-center justify-center">
-                            <img
-                              className="w-[50px] h-[50px] object-cover overflow-hidden rounded-full"
-                              src={mistri.profileImage}
-                              alt="mistri"
-                            />
-                          </div>
-                          <div className="h-full flex flex-col justify-center ml-2 whitespace-nowrap overflow-hidden text-ellipsis">
-                            <h3 className="text-xl font-bold">{mistri.profession}</h3>
-                            <h2 className="whitespace-nowrap overflow-hidden text-ellipsis">{mistri.address}</h2>
-                            <h1 className="whitespace-nowrap overflow-hidden text-ellipsis">{mistri.mistriname}</h1>
-                          </div>
-                        </div>
+      {/* <ToastContainer position="top-center" /> */}
+      <div className="h-full bg-gradient-to-b from-gray-50 to-gray-100  w-full overflow-hidden pb-[70px]">
+        {/* Header */}
+    
+        {/* Back Button */}
+        <div className=" pt-3">
+          <Button
+            onClick={() => navigate(-1)}
+            variant="ghost"
+            className="flex items-center text-gray-600 hover:text-black transition-colors duration-200">
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+        </div>
 
-                        <div className="Inputs-Charges-Date-Time w-full overflow-y-auto noScroll flex flex-col px-2 ">
-                          {/* Mistri Charges Input */}
-                          <h3 className="mt-2 text-xl">Mistri charges</h3>
-                          <label
-                            // key={index2}
-                            className=" p-2 rounded-md border-[2px] w-full border-[#CACFD6]  outline-none flex items-center">
-                            <input
-                              name="charges"
-                              onChange={(e) => setCharges(e.target.value)}
-                              type="number"
-                              className="w-full   outline-none"
-                              defaultValue={mistri.charges}
-                              placeholder="Your price"
-                            />
-                            ₹
-                          </label>
+        <div className="max-w-3xl  px-4 overflow-y-auto h-full pb-[200px]">
+          {/* Mistri Card */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6 transform transition-all duration-300 hover:shadow-lg ">
+            <div className="bg-gradient-to-r from-gray-900 to-black text-white p-6">
+              <div className="flex items-center">
+                <div className="mr-4 relative">
+                  <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-md">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={mistri.profileImage}
+                      alt={mistri.mistriname}
+                    />
+                  </div>
+                  {mistri.isVerified && (
+                    <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1 rounded-full">
+                      <CheckCircle className="w-4 h-4" />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">{mistri.mistriname}</h1>
+                  <div className="flex items-center mt-1">
+                    <span className="text-gray-300 mr-4">{mistri.profession}</span>
+                    <div className="flex items-center">
+                      <span className="bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-medium flex items-center">
+                        <Star className="w-3 h-3 mr-1 fill-current" />
+                        4.8
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center mt-2 text-gray-300 text-sm">
+                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                    <span className="truncate max-w-xs">{mistri.address}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                          {/* Appointment Date Input */}
-                          <h3 className="mt-2 text-xl">Select date for appointment</h3>
-                          <input
-                            name="orderDate"
-                            onChange={(e) => setDate(e.target.value)}
-                            type="date"
-                            className="p-2 rounded-md border-[2px] w-full border-[#CACFD6] hover:border-black outline-none "
-                            placeholder="Select date"
-                          />
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-semibold">Service Charge</h3>
+         
+                </div>
+                <div className="flex items-center text-green-600 font-bold text-xl">
+                  <IndianRupee className="w-5 h-5 mr-1" />
+                  <span>{mistri.charges}</span>
+                </div>
+              </div>
+            </div>
 
-                          {/* Appointment Time Input */}
-                          <h3 className="mt-2 text-xl ">Select time for appointment</h3>
-                          <input
-                            name="orderTime"
-                            onChange={(e) => setTime(e.target.value)}
-                            type="time"
-                            className="p-2 rounded-md border-[2px] w-full border-[#CACFD6] hover:border-black outline-none mb-2 "
-                            placeholder="Select time"
-                          />
-
-                          {/* <div className=" w-full flex flex-col "> */}
-                          {userFeilds.map((userFeild, index2) => (
-                            <div
-                              key={index2}
-                              className="w-full">
-                              <h3 className="text-xl mt-2">{userFeild.label}</h3>
-                              <label
-                                // key={index2}
-                                className="p-2 rounded-md border-[2px] w-full border-[#CACFD6]  outline-none flex items-center">
-                                <input
-                                  type="text"
-                                  disabled={userFeild.disabled ? true : false}
-                                  className=" w-full h-full bg-none "
-                                  value={userFeild.value}
-                                  onChange={(e) => handleInputChange(e, index2)} // Add a handler for change
-                                />
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-label="Settings"
-                                  className="p-1 "
-                                  fill="currentColor"
-                                  height="24"
-                                  role="img"
-                                  viewBox="0 0 24 24"
-                                  width="24">
-                                  {userFeild.path}
-                                </svg>
-                              </label>
-                            </div>
-                          ))}
-                          <div className="w-full flex items-center justify-center">
-                            <Button className="bg-gray-300  mt-4 px-2 py-3  xl:w-[90%] rounded-md text-white flex items-center justify-center">
-                              Edit profile
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-label="Settings"
-                                className="p-1"
-                                fill="currentColor"
-                                height="24"
-                                role="img"
-                                viewBox="0 0 24 24"
-                                width="24">
-                                <path d="M15.7279 9.57627L14.3137 8.16206L5 17.4758V18.89H6.41421L15.7279 9.57627ZM17.1421 8.16206L18.5563 6.74785L17.1421 5.33363L15.7279 6.74785L17.1421 8.16206ZM7.24264 20.89H3V16.6473L16.435 3.21231C16.8256 2.82179 17.4587 2.82179 17.8492 3.21231L20.6777 6.04074C21.0682 6.43126 21.0682 7.06443 20.6777 7.45495L7.24264 20.89Z"></path>
-                              </svg>
-                            </Button>
-                          </div>
-                          {/* </div> */}
-                        </div>
-
-                        <div className="Confirm-Booked-Button w-full flex flex-col items-center justify-center sm:fixed xl:relative sm:bottom-[70px] xl:bottom-0 left-0  mt-2 z-50">
-                          {user ? (
-                            user.orders.some((order) => order.mistri === mistri._id) ? (
-                              <Button className="bg-black sm:mt-0 px-2 py-6 xl:w-[90%] sm:w-full xl:rounded-md text-white flex items-center justify-center">
-                                Booked
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-label="Settings"
-                                  className=""
-                                  fill="currentColor"
-                                  height="24"
-                                  role="img"
-                                  viewBox="0 0 24 24"
-                                  width="24">
-                                  <path d="M13 10H20L11 23V14H4L13 1V10Z"></path>
-                                </svg>
-                              </Button>
-                            ) : (
-                              <Button
-                                onClick={(e) => sendConfirmBookingRequest(e)}
-                                className="bg-black sm:mt-0 px-2 py-6 xl:w-[90%] sm:w-full xl:rounded-md text-white flex items-center justify-center">
-                                Confirm booking
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-label="Settings"
-                                  className=""
-                                  fill="currentColor"
-                                  height="24"
-                                  role="img"
-                                  viewBox="0 0 24 24"
-                                  width="24">
-                                  <path d="M13 10H20L11 23V14H4L13 1V10Z"></path>
-                                </svg>
-                              </Button>
-                            )
-                          ) : (
-                            <Link
-                              to="/login"
-                              className="bg-black sm:mt-0 px-2 py-5 xl:w-[90%] sm:w-full xl:rounded-md text-white flex items-center justify-center">
-                              Login
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-label="Settings"
-                                className=""
-                                fill="currentColor"
-                                height="24"
-                                role="img"
-                                viewBox="0 0 24 24"
-                                width="24">
-                                <path d="M13 10H20L11 23V14H4L13 1V10Z"></path>
-                              </svg>
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                </>
-              ) : (
-                <>
-                  <div></div>
-                </>
-              )}
+            <div className="px-6 py-4 bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center text-gray-600">
+                  <Clock className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Available 7 days a week</span>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span className="text-sm">Quick response</span>
+                </div>
+              </div>
             </div>
           </div>
-        </>
-      ) : (
-        <>Loading</>
-      )}
+
+          {/* Booking Form */}
+          <div className="bg-white rounded-xl shadow-md mb-6 transform transition-all duration-300 hover:shadow-lg">
+            <div className="p-6 border-b bg-gradient-to-r from-gray-50 to-white">
+              <h2 className="text-xl font-bold mb-1">Booking Details</h2>
+              <p className="text-gray-500 text-sm">Select your preferred date and time</p>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-2 text-gray-500 group-hover:text-black transition-colors duration-200" />
+                      Appointment Date
+                    </div>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="orderDate"
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                      min={new Date().toISOString().split("T")[0]}
+                      required
+                    />
+                  </div>
+                  {!date && <p className="mt-1 text-xs text-amber-600">Please select a date</p>}
+                </div>
+
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-2 text-gray-500 group-hover:text-black transition-colors duration-200" />
+                      Appointment Time
+                    </div>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="time"
+                      name="orderTime"
+                      onChange={(e) => setTime(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                      required
+                    />
+                  </div>
+                  {!time && <p className="mt-1 text-xs text-amber-600">Please select a time</p>}
+                </div>
+              </div>
+
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="flex items-center">
+                    <IndianRupee className="w-4 h-4 mr-2 text-gray-500 group-hover:text-black transition-colors duration-200" />
+                    Service Charge 
+                  </div>
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="charges"
+                    defaultValue={mistri.charges}
+                    onChange={(e) => setCharges(e.target.value)}
+                    className="w-full p-3  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                    min={mistri.charges}
+                    required
+                  />
+                
+                </div>
+                <p className="text-xs text-gray-500 mt-2 flex items-center">
+                  <span className="inline-block w-4 h-4 bg-gray-200 rounded-full mr-2 flex items-center justify-center text-xs">i</span>
+                  Minimum charge is ₹{mistri.charges}. You can increase the amount if needed.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* User Information */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6 transform transition-all duration-300 hover:shadow-lg">
+            <div className="p-6 border-b bg-gradient-to-r from-gray-50 to-white">
+              <h2 className="text-xl font-bold mb-1">Your Information</h2>
+              <p className="text-gray-500 text-sm">This information will be shared with the service provider</p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {userFields.map((field, index) => (
+                <div
+                  key={index}
+                  className="flex items-center border-b pb-4 last:border-0 last:pb-0 hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
+                  <div className="bg-gray-100 p-3 rounded-full mr-4 text-gray-600">{field.icon}</div>
+                  <div>
+                    <p className="text-sm text-gray-500">{field.label}</p>
+                    <p className="font-medium">{field.value || "Not provided"}</p>
+                  </div>
+                </div>
+              ))}
+
+              <div className="pt-4">
+                <Link to="/profile">
+                  <Button
+                    variant="outline"
+                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                      />
+                    </svg>
+                    Edit Profile Information
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Booking Button */}
+          <div className="fixed xl:bottom-0 right-0 sm:px-4 xl:w-[80%] sm:w-full sm:bottom-[55px] shadow-lg  z-50  md:px-0">
+            <div className=" ">
+              <div className="bg-white border-t p-4 shadow-lg rounded-t-xl backdrop-blur-md bg-opacity-95">
+                {isAlreadyBooked ? (
+                  <div className="flex flex-col items-center">
+                    <Button
+                      disabled
+                      className="w-full bg-gray-800 text-white py-6 flex items-center justify-center opacity-90 rounded-lg">
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                      Already Booked
+                    </Button>
+                    <Link
+                      to="/bookings"
+                      className="mt-2 text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                      View your bookings
+                    </Link>
+                  </div>
+                ) : (
+                  <div>
+                    <Button
+                      onClick={handleConfirmBooking}
+                      disabled={submitting || !date || !time}
+                      className={`
+                        w-full py-6 flex items-center justify-center rounded-lg
+                        ${
+                          !date || !time
+                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                            : "bg-black hover:bg-gray-800 text-white transform hover:-translate-y-1 transition-all duration-200"
+                        }
+                      `}>
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>Confirm Booking</>
+                      )}
+                    </Button>
+                    {(!date || !time) && <p className="text-center text-xs text-amber-600 mt-2">Please select both date and time to proceed</p>}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

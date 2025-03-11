@@ -10,6 +10,9 @@ import {userContext} from "../context/Auth.context";
 import MistriComponent from "../components/Mistri.component";
 import {InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot} from "@/components/ui/input-otp";
 import {mistriContext} from "../context/Mistris.context";
+import MistriList from "@/components/MistriList";
+import PageHeader from "@/components/ui/PageHeader";
+import {motion} from "framer-motion";
 const Home = () => {
   const {mistris, setMistris} = useContext(mistriContext);
   const [mistrisLoadingArray, setMistrisLoadingArray] = useState([{}, {}, {}, {}, {}, {}, {}, {}]);
@@ -23,7 +26,7 @@ const Home = () => {
     if (mistris.length < 1) {
       fetchMistris();
     } else {
-      setMistris([mistris[0]]);
+      setMistris(mistris);
       setLoading(false);
     }
   }, []);
@@ -31,7 +34,6 @@ const Home = () => {
     axios.get(`${backendURL}/user/fetch/mistri`).then(function (response) {
       if (response && response.data.status === "OK" && response.data.mistri.length > 0) {
         setMistris(response.data.mistri);
-        console.log(response.data.mistri);
       } else if (response && response.data.status === "OK" && response.data.mistri.length === 0) {
         setMistris([]);
       }
@@ -49,8 +51,8 @@ const Home = () => {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             onClick={() => sethidden(true)}
-            aria-label="Settings"
-            className="p-1  hover:text-red-500 transition-all cursor-pointer "
+            aria-label="Close"
+            className="p-1 hover:text-red-500 transition-all cursor-pointer"
             fill="currentColor"
             height="24"
             role="img"
@@ -67,18 +69,23 @@ const Home = () => {
         </div>
       </div>
       <ToastContainer />
-      <div className="flex flex-col w-full h-full bg-zinc-100 p-2 overflow-y-auto sm:pb-20 xl:pb-0">
-        <div className=" xl:mt-2">
-          <h4 className="text-4xl font-black ">Discover Mistris.</h4>
-          <p className="text-lg w-[90%] xl:block text-indexColor">Find best and pocket friendly Mistris.</p>
-        </div>
+      <div className="flex flex-col w-full h-full bg-zinc-100 p-2 overflow-y-auto sm:pb-[130px] xl:pb-[200px] mt-4 ">
+        <PageHeader
+          title="Discover Mistris."
+          subtitle="Find best and pocket friendly Mistris."
+        />
         <Link
           to={"/search"}
           className="flex mt-4">
           <Search />
         </Link>
 
-        <div className="noScroll w-full xl:h-[80%]   flex flex-wrap  ">
+        <motion.div
+          initial={{opacity: 0, y: 20}}
+          animate={{opacity: 1, y: 0}}
+          exit={{opacity: 0, y: -20}}
+          transition={{duration: 0.3}}
+          className="noScroll w-full xl:h-[80%]   flex flex-wrap  ">
           {loading ? (
             <MistriSkeletonLoading />
           ) : userLoading ? (
@@ -86,8 +93,7 @@ const Home = () => {
           ) : user && user.acceptedOrder.length > 0 ? (
             mistris.length > 0 ? (
               <>
-                {/* {console.log(true)} */}
-                <MistriComponent
+                <MistriList
                   mistris={mistris}
                   showBookingBtns={true}
                 />
@@ -111,7 +117,7 @@ const Home = () => {
             )
           ) : mistris.length > 0 ? (
             <>
-              <MistriComponent
+              <MistriList
                 mistris={mistris}
                 showBookingBtns={true}
               />
@@ -133,7 +139,7 @@ const Home = () => {
               </>
             </>
           )}
-        </div>
+        </motion.div>
       </div>
     </>
   );

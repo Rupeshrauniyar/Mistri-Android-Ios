@@ -64,7 +64,7 @@ const checkController = async (req, res) => {
 const userFetchMistriController = async (req, res) => {
     try {
 
-        const mistri = await mistriModel.find({ isVerified: true, isAvailable: true }).select("-password -contactNumber -email -idProof -isVerified -createdAt -role -__v").limit(5)
+        const mistri = await mistriModel.find({ isVerified: true, isAvailable: true }).select("-password -contactNumber -email -idProof -isVerified -orders -rejectedOrders -acceptedOrder -history -role -__v").limit(5)
         if (mistri && mistri.length > 0) {
             return res.json({ message: "Mistri found", status: "OK", mistri })
 

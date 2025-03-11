@@ -4,23 +4,30 @@ import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {Link, useNavigate, useLocation} from "react-router-dom";
 import {userContext} from "../context/Auth.context";
+import { Loader2 } from "lucide-react";
+
 const LoginComp = (props) => {
   const navigate = useNavigate();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const {user, setUser, setUserLoading} = useContext(userContext);
+  const [loading, setLoading] = useState(false);
   const [inpValue, setInpValue] = useState({
     email: "",
     password: "",
   });
   const {state} = useLocation();
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.post(`${backendUrl}/auth/user/login`, inpValue).then((response) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${backendUrl}/auth/user/login`, inpValue);
       if (response.data.status === "BAD") {
         toast.error(response.data.message);
       } else if (response.data.status === "OK") {
         toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         setUser(response.data.user);
         if (props.doRedirect === true) {
           setTimeout(() => {
@@ -32,8 +39,13 @@ const LoginComp = (props) => {
           }, 500);
         }
       }
-    });
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
   const handleInput = (e) => {
     const {name, value} = e.currentTarget;
     setInpValue((prev) => ({
@@ -41,6 +53,7 @@ const LoginComp = (props) => {
       [name]: value,
     }));
   };
+
   const requiredFields = [
     {
       name: "email",
@@ -56,12 +69,11 @@ const LoginComp = (props) => {
           <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
         </svg>
       ),
-      placeholder: "Email",
+      placeholder: "Enter your email address",
     },
     {
       name: "password",
       label: "Password",
-
       type: "password",
       svg: (
         <svg
@@ -76,58 +88,77 @@ const LoginComp = (props) => {
           />
         </svg>
       ),
-      placeholder: "Password",
+      placeholder: "Enter your password",
     },
   ];
+
+  if (props.setHidden) {
+    return null;
+  }
+
   return (
-    <>
-      {/* <ToastContainer /> */}
-      {props.setHidden ? (
-        <></>
-      ) : (
-        <>
-          <div className="w-full h-full flex flex-col items-center justify-center bg-white">
-            <h3 className="text-3xl font-bold">Welcome Back,</h3>
-            <form onSubmit={(e) => handleSubmit(e)} className="xl:w-[30%] sm:w-full">
-              {requiredFields.map((requiredField, index) => (
-                <div key={index} className="w-full px-2">
-                  <h3 className="mt-2 text-xl">{requiredField.label}</h3>
+    <div className="w-full    flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="w-full h-full">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-gray-900">Welcome back</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Sign in to your account to continue
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            {requiredFields.map((field, index) => (
+              <div key={index}>
+                <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                  {field.label}
+                </label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    {field.svg}
+                  </div>
                   <input
-                    onChange={(e) => handleInput(e)}
-                    name={requiredField.name}
-                    type={requiredField.type}
-                    className="p-2 rounded-md border-[2px] w-full border-[#CACFD6] hover:border-black outline-none"
-                    placeholder={requiredField.placeholder}
+                    id={field.name}
+                    name={field.name}
+                    type={field.type}
+                    required
+                    onChange={handleInput}
+                    className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200"
+                    placeholder={field.placeholder}
                   />
                 </div>
-              ))}
-              <div className=" w-full flex items-center sm:justify-center xl:justify-between">
-                <span className="px-1">
-                  <span>Don't have an account? </span>
-                  <Link
-                    className=" text-blue-500"
-                    to="/register">
-                    register
-                  </Link>
-                </span>
-
-                <Link to="/forgot-password">
-                  <span className="xl:block sm:hidden text-blue-500">Forgot Password?</span>
-                </Link>
               </div>
-              <div className=" xl:hidden sm:flex items-center justify-center">
-                <Link to="/forgot-password">
-                  <span className=" text-[#075CE5] ">Forgot Password?</span>
-                </Link>
-              </div>
-              <div className="w-full flex items-center justify-center">
-                <button className="bg-black hover:bg-[#00000044] text-white mt-2 px-4 py-4 rounded-xl border-none outline-none w-[98%] text-xl">Login</button>
-              </div>
-            </form>
+            ))}
           </div>
-        </>
-      )}
-    </>
+
+          <div className="flex items-center justify-between">
+            <div className="text-sm">
+              <span className="text-gray-600">Create an account? </span>
+              <Link to="/register" className="font-medium text-black hover:text-gray-800 transition-colors">
+                Sign up
+              </Link>
+            </div>
+            <div className="text-sm">
+              <Link to="/forgot-password" className="font-medium text-black hover:text-gray-800 transition-colors">
+                Forgot password?
+              </Link>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              "Sign in"
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

@@ -1,49 +1,70 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import {userContext} from "../context/Auth.context";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
+import {Search, Menu, Bell, User, LogOut, Settings} from "lucide-react";
+
 const TopNavbar = () => {
   const {user} = useContext(userContext);
+
   return (
     <>
-      {/* {console.log(user)} */}
-      <div className="flex items-center justify-between fixed top-0 left-0 w-full bg-white z-[999] shadow-sm xl:p-[6px] sm:p-3 xl:px-4 sm:px-[6px]">
-        <div className="flex items-center justify-center">
-          <img
-            src={
-              "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAgMmE0IDQgMCAxIDAgMCA4IDQgNCAwIDAgMCAwLThaTTcgNmEzIDMgMCAxIDEgNiAwIDMgMyAwIDAgMS02IDBabS0yIDVhMiAyIDAgMCAwLTIgMmMwIDEuNy44MyAyLjk3IDIuMTMgMy44QTkuMTQgOS4xNCAwIDAgMCAxMCAxOGMxLjg1IDAgMy41OC0uMzkgNC44Ny0xLjJBNC4zNSA0LjM1IDAgMCAwIDE3IDEzYTIgMiAwIDAgMC0yLTJINVptLTEgMmExIDEgMCAwIDEgMS0xaDEwYTEgMSAwIDAgMSAxIDFjMCAxLjMtLjYyIDIuMjgtMS42NyAyLjk1QTguMTYgOC4xNiAwIDAgMSAxMCAxN2E4LjE2IDguMTYgMCAwIDEtNC4zMy0xLjA1QTMuMzYgMy4zNiAwIDAgMSA0IDEzWiIvPjwvc3ZnPg=="
-            }
-            className="xl:ml-1 mr-2 p-1 rounded-full object-cover bg-zinc-200 border-2 xl:w-10 xl:h-10 sm:w-8 sm:h-8 cursor-pointer"
-            alt=""
-          />
-          {user ? <p>{user.username}</p> : <p className="text-red-500">Guest</p>}
-        </div>
+      <div className="fixed top-0 left-0 w-full bg-white z-[999] shadow-md rounded-b-2xl">
+        <div className="max-w-full ">
+          <div className="flex items-center justify-between py-3 xl:px-6 sm:px-2">
+            {/* Left side - User info */}
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                {user ? (
+                  <div className="w-10 h-10 bg-gradient-to-br from-black to-gray-700 text-white rounded-full flex items-center justify-center font-bold shadow-md">
+                    {user?.username?.charAt(0).toUpperCase()}
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center shadow-md">
+                    <User className="w-5 h-5" />
+                  </div>
+                )}
+                <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+              </div>
 
-        <div className="flex items-center justify-center">
-          <Link to="/search" className="flex">
-            <span className="bg-zinc-100 rounded-full p-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                className="w-5 h-5">
-                <path
-                  fillRule="evenodd"
-                  d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </span>
-          </Link>
+              <div className="flex flex-col">
+                {user ? (
+                  <>
+                    <p className="font-medium text-gray-800">{user.username}</p>
+                   
+                  </>
+                ) : (
+                  <p className="font-medium text-red-500">Guest</p>
+                )}
+              </div>
+            </div>
 
-          <svg
-            className="w-5 h-5"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor">
-            <path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"></path>
-          </svg>
+            {/* Right side - Actions */}
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/search"
+                className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200">
+                <Search className="w-5 h-5 text-gray-700" />
+              </Link>
+
+              <Link
+                to="/notifications"
+                className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200 relative">
+                <Bell className="w-5 h-5 text-gray-700" />
+                {user && <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>}
+              </Link>
+
+              <Link
+                to={"/settings"}
+                className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200">
+                <Menu className="w-5 h-5 text-gray-700" />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Spacer to prevent content from hiding behind the navbar */}
+      <div className="h-16"></div>
     </>
   );
 };

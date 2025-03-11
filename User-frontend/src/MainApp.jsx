@@ -17,6 +17,7 @@ import Search from "./pages/Search.jsx";
 import Create from "./pages/Create.jsx";
 import Book from "./pages/Book.jsx";
 import History from "./pages/History.jsx";
+import Profile from "./pages/Profile.jsx";
 // Components
 
 import Navbar from "./components/Navbar.jsx";
@@ -51,14 +52,13 @@ function MainApp() {
 
   return (
     <>
-      <div className="w-full h-screen dark:bg-black dark:text-white bg-zinc-200 text-black flex overflow-hidden">
+      <div className="w-full min-h-screen dark:bg-black dark:text-white bg-zinc-200 text-black flex overflow-hidden">
         <Navbar />
-
-        <div>
+        <div >
           <TopNavbar />
         </div>
 
-        <div className="xl:w-[80%] mt-[53px] sm:w-full h-screen dark:bg-black dark:text-white bg-zinc-100 text-black flex">
+        <div className=" xl:w-[85%]  sm:w-full min-h-full dark:bg-black dark:text-white bg-zinc-100 text-black mt-[55px]">
           <Routes>
             {/* Universal routes */}
             <Route
@@ -104,6 +104,10 @@ function MainApp() {
               <Route
                 path="/history"
                 element={<History />}
+              />
+              <Route
+                path="/profile"
+                element={<Profile />}
               />
             </Route>
 

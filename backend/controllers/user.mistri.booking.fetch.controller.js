@@ -13,7 +13,7 @@ const displayBookingMistri = async (req, res) => {
     try {
         const mistri = await mistriModel
             .findOne({ _id: data.mistriId })
-            .select("-password -contactNumber -email -idProof -isVerified -createdAt -role -__v -orders -history ");
+            .select("-password -contactNumber -email -idProof -isVerified -createdAt -role -__v -orders -rejectedOrders -acceptedOrder -history ");
         if (mistri) {
             return res.json({ message: "Mistri found", status: "OK", mistri });
 

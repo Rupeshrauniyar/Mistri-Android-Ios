@@ -7,7 +7,7 @@ import {formatDistanceToNow} from "date-fns";
  * @param {Object} props
  * @param {Object} props.order - The order data
  */
-const Orders = ({order}) => {
+const ActiveOrdersComp = ({order}) => {
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case "completed":
@@ -25,21 +25,17 @@ const Orders = ({order}) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-4 transition-all hover:shadow-md ">
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4  transition-all  hover:ring-2 ring-black cursor-pointer">
+      
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center space-x-3">
           <img
-            src={
-              order.mistri?.profileImage ||
-              "https://imgs.search.brave.com/oJmhCNRk22fQdZbu84cZUAGtfWey9UBMhi06dAXg6lw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9jcmVhdGUtcGlj/dHVyZS10aGF0LXJl/cHJlc2VudHMtZGl2/ZXJzZS10ZWFtLWNv/bnN0cnVjdGlvbi13/b3JrZXJzLXN1Z2dl/c3RpbmctY29sbGFi/b3JhdGl2ZS1lXzkz/OTAzMy0xMDI1NDYu/anBnP3NpemU9NjI2/JmV4dD1qcGc"
-            }
+            src={order.mistri?.profileImage || "/default-avatar.png"}
             alt={order.mistri?.mistriname}
             className="w-12 h-12 rounded-full object-cover"
           />
           <div>
-            <h3 className={`font-semibold text-lg ${order.mistri ? "" : "text-gray-400"}`}>
-              {order.mistri ? order.mistri.mistriname.slice(0, 10) : "Pending"}
-            </h3>
+            <h3 className="font-semibold text-lg">{order.mistri?.mistriname.slice(0, 10)}...</h3>
             <p className="text-gray-600 text-sm">{order.mistri?.profession}</p>
           </div>
         </div>
@@ -61,7 +57,7 @@ const Orders = ({order}) => {
         </div>
         <div>
           <p className="text-sm text-gray-500">Location</p>
-          <p className={`font-medium truncate ${order.mistri ? "" : "text-gray-400"}`}>{order.mistri ? order.mistri.address : "Pending"}</p>
+          <p className="font-medium truncate">{order.mistri?.address}</p>
         </div>
       </div>
 
@@ -73,4 +69,4 @@ const Orders = ({order}) => {
   );
 };
 
-export default Orders;
+export default ActiveOrdersComp;

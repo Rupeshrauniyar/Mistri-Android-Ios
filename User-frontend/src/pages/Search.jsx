@@ -1,34 +1,44 @@
-import React, {useEffect, useState} from "react";
-import {Link, useLocation} from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchComp from "@/components/SearchComp";
 import axios from "axios";
+import MistriList from "@/components/MistriList";
+import { Search as SearchIcon, ArrowLeft, Filter, X, Loader2 } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
+
 const backendURL = import.meta.env.VITE_BACKEND_URL;
-import MistriComponent from "@/components/Mistri.component";
+
 const Search = () => {
   const [mistris, setMistris] = useState([]);
   const [searchFilter, setSearchFilter] = useState([]);
   const [error, setError] = useState(false);
-  const [searchedVal, setSearchedVal] = useState();
+  const [searchedVal, setSearchedVal] = useState("");
   const [allowSuggestions, setAllowSuggestions] = useState(true);
-
-  const location = useLocation(); // Get the current location (URL)
+  const [loading, setLoading] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Extract the 'q' parameter from the URL
-  const getQueryParam = () => {
-    const params = new URLSearchParams(location.search); // Use location.search
+  const getQueryParam = useCallback(() => {
+    const params = new URLSearchParams(location.search);
     const query = params.get("q");
     return query;
-  };
+  }, [location.search]);
 
-  const searchQuery = getQueryParam(); // Get query from URL
+  const searchQuery = getQueryParam();
 
+  // Fetch search results when query changes
   useEffect(() => {
     if (searchQuery) {
-      setAllowSuggestions(false); // Allow suggestions to be shown after query load
-      const SearchWithProfession = async () => {
+      setSearchedVal(searchQuery);
+      setAllowSuggestions(false);
+      setLoading(true);
+      
+      const searchWithProfession = async () => {
         try {
-          const response = await axios.post(`${backendURL}/api/user/search`, {query: searchQuery});
-          console.log(response);
+          const response = await axios.post(`${backendURL}/api/user/search`, { query: searchQuery });
 
           if (response.status === 200 && response.data.message === "success") {
             setMistris(response.data.mistri);
@@ -37,12 +47,18 @@ const Search = () => {
           }
         } catch (error) {
           console.error("Error fetching search results:", error);
-          setMistris([]); // Optionally handle the error more gracefully
+          setMistris([]);
+        } finally {
+          setLoading(false);
         }
       };
-      SearchWithProfession();
+      
+      searchWithProfession();
+    } else {
+      setAllowSuggestions(true);
+      setMistris([]);
     }
-  }, [searchQuery]); // Ensure effect runs on searchQuery change
+  }, [searchQuery]);
 
   const MistriOptions = [
     "Carpenter",
@@ -149,76 +165,200 @@ const Search = () => {
     "Kitchen Remodeler",
   ];
 
+  // Popular categories for quick access
+  const popularCategories = [
+    "Electrician",
+    "Plumber",
+    "Carpenter",
+    "Painter",
+    "Handyman",
+    "HVAC Technician"
+  ];
+
   const searchFnc = (e) => {
-    if (allowSuggestions === false) {
-      setAllowSuggestions(true);
-    }
+    setSearchedVal(e);
+    
     if (e.length > 0) {
-      setSearchedVal(e);
+      setAllowSuggestions(true);
       const searchTerm = e.trim().toLowerCase();
-      const filteredOptions = MistriOptions.filter((option) => option.toLowerCase().includes(searchTerm));
+      const filteredOptions = MistriOptions.filter((option) => 
+        option.toLowerCase().includes(searchTerm)
+      ).slice(0, 10); // Limit to 10 results for better performance
+      
       setSearchFilter(filteredOptions);
       setError(filteredOptions.length === 0);
     } else {
       setSearchFilter([]);
+      setError(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchedVal("");
+    setSearchFilter([]);
+    navigate("/search");
+  };
+
+  const toggleFilter = (filter) => {
+    if (selectedFilters.includes(filter)) {
+      setSelectedFilters(selectedFilters.filter(f => f !== filter));
+    } else {
+      setSelectedFilters([...selectedFilters, filter]);
+    }
+  };
+
+  const handleSearchSubmit = (term) => {
+    if (term) {
+      navigate(`/search?q=${term}`);
     }
   };
 
   return (
-    <div className="w-full p-2">
-      {console.log(mistris)}
-      {allowSuggestions ? (
-        <>
-          <SearchComp fnc={searchFnc} />
-          <div className="Suggestion w-full flex flex-col overflow-y-auto h-[71vh] noScroll">
-            {error ? (
-              <h3 className="text-center">No search term found: "{searchedVal}"</h3>
-            ) : (
-              searchFilter.map((search, i) => (
-                <Link
-                  to={`/search?q=${search}`}
-                  key={i}>
-                  <div className="flex items-center">
-                    <span className="bg-zinc-200 rounded-full p-2 flex w-[35px] items-center justify-center ">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        className="w-5 h-5">
-                        <path
-                          fillRule="evenodd"
-                          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </span>
-                    <p className=" mt-1 p-2 rounded-md cursor-pointer">{search}</p>
-                  </div>
-                </Link>
-              ))
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 bg-white shadow-md z-30">
+      
+        
+        {/* Search Controls */}
+        <div className="p-4">
+          {/* Back Button */}
+          <button 
+            onClick={() => navigate(-1)} 
+            className="flex items-center text-gray-600 hover:text-black transition-colors duration-200 mb-3"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </button>
+          
+          {/* Search Input */}
+          <div className="flex items-center bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="pl-4 text-gray-400">
+              <SearchIcon className="w-5 h-5" />
+            </div>
+            <input
+              type="text"
+              value={searchedVal}
+              onChange={(e) => searchFnc(e.target.value)}
+              placeholder="Search for services..."
+              className="w-full py-3 px-3 focus:outline-none"
+            />
+            {searchedVal && (
+              <button 
+                onClick={handleClearSearch}
+                className="pr-4 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
             )}
           </div>
-        </>
-      ) : (
-        <>
-          <Link
-            to="/search"
-            className="flex mt-3">
-            <SearchComp fnc={searchFnc} />
-          </Link>
-
-          {mistris.length > 0 ? (
-            <>
-              <MistriComponent
-                mistris={mistris}
-                showBookingBtns={true}
-              />
-            </>
-          ) : (
-            <h3 className="text-center mt-4">No result found...</h3>
+        </div>
+      </div>
+      
+      {/* Scrollable Content */}
+      <div className="flex-grow overflow-y-auto bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          {/* Search Suggestions */}
+          {allowSuggestions && searchFilter.length > 0 && (
+            <div className="mb-4">
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+                {searchFilter.map((search, i) => (
+                  <div 
+                    key={i}
+                    onClick={() => handleSearchSubmit(search)}
+                    className="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
+                  >
+                    <span className="bg-gray-100 rounded-full p-2 mr-3 flex items-center justify-center">
+                      <SearchIcon className="w-4 h-4 text-gray-600" />
+                    </span>
+                    <p className="text-gray-700">{search}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
-        </>
-      )}
+          
+          {/* Popular Categories */}
+          {allowSuggestions && !searchQuery && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-3">Popular Categories</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {popularCategories.map((category, index) => (
+                  <Link 
+                    key={index} 
+                    to={`/search?q=${category}`}
+                    className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200 flex items-center"
+                  >
+                  
+                    <span className="text-gray-800 truncate">{category}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Search Results */}
+          {!allowSuggestions && (
+            <div>
+              {/* Results Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">
+                  {loading ? 'Searching...' : 
+                    mistris.length > 0 ? 
+                      `Results for "${searchQuery}"` : 
+                      `No results for "${searchQuery}"`
+                  }
+                </h2>
+                
+                <button className="flex items-center text-gray-600 bg-white px-3 py-2 rounded-lg shadow-sm hover:bg-gray-50">
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filter
+                </button>
+              </div>
+              
+              {/* Loading State */}
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="w-10 h-10 text-black animate-spin mb-4" />
+                  <p className="text-gray-600">Searching for professionals...</p>
+                </div>
+              ) : mistris.length > 0 ? (
+                <MistriList
+                  mistris={mistris}
+                  showBookingBtns={true}
+                />
+              ) : (
+                <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <SearchIcon className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-800 mb-2">No results found</h3>
+                  <p className="text-gray-600 mb-4">
+                    We couldn't find any professionals matching "{searchQuery}".
+                  </p>
+                  <p className="text-gray-600">
+                    Try checking your spelling or using more general terms.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Error State */}
+          {error && searchedVal && (
+            <div className="bg-white rounded-xl shadow-sm p-6 text-center mt-4">
+              <h3 className="text-lg font-medium text-gray-800 mb-2">
+                No suggestions found for "{searchedVal}"
+              </h3>
+              <p className="text-gray-600">
+                Try checking your spelling or using more general terms.
+              </p>
+            </div>
+          )}
+          
+          {/* Bottom Spacer for Mobile */}
+          <div className="h-20"></div>
+        </div>
+      </div>
     </div>
   );
 };
