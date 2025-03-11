@@ -20,6 +20,10 @@ export const AuthProvider = ({children}) => {
   }, []);
   useEffect(() => {
     const CheckUser = async () => {
+      const LocalUser = JSON.parse(localStorage.getItem("user"));
+
+      const token = localStorage.getItem("token");
+
       if (token && LocalUser) {
         await axios.post(`${backendUrl}/user/check`, {token}).then((response) => {
           if (response.data.status === "OK" && response.data.user) {
