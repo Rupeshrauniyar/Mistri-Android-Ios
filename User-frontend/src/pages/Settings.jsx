@@ -11,7 +11,7 @@ const Settings = () => {
   const [emailNotifications, setEmailNotifications] = useState(true);
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    localStorage.setItem("dark", true);
     // Here you would implement the actual dark mode logic
   };
 
@@ -64,15 +64,16 @@ const Settings = () => {
       ],
     },
   ];
-
+  const handleToggle = (label) => {
+    console.log(label);
+    if (label === "Dark Mode") {
+      toggleDarkMode();
+    } else {
+    }
+  };
   return (
     <div className="w-full min-h-screen bg-white mt-3 pb-[100px]">
-      <div className="px-2">
-        <PageHeader
-          title="Settings"
-          className="px-3"
-        />
-      </div>
+      <div className="px-2"></div>
 
       <div className="p-4">
         {settingsGroups.map((group, groupIndex) => (
@@ -92,7 +93,7 @@ const Settings = () => {
 
                   {item.isToggle ? (
                     <button
-                      onClick={item.onChange}
+                      onClick={() => handleToggle(item.label)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${
                         item.value ? "bg-black" : "bg-gray-200"
                       }`}>

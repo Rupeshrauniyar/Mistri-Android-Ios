@@ -25,7 +25,7 @@ const ActiveOrdersComp = ({order}) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4  transition-all  hover:ring-2 ring-black cursor-pointer">
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4  cursor-pointer">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center space-x-3">
           <img

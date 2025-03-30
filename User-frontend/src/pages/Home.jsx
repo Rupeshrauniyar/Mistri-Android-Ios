@@ -175,12 +175,12 @@ const Home = () => {
           {/* Continue button - placed outside SimplePullToRefresh */}
         </SimplePullToRefresh>
         {selectedMistriId && (
-          <div className="fixed xl:bottom-0 sm:bottom-[60px] right-0 xl:w-[80%] sm:w-full z-50">
+          <div className="fixed xl:bottom-0 sm:bottom-[60px] right-0 xl:w-[81%] sm:w-full z-50">
             <div className="opacity-100 flex w-full items-center justify-center transition-all">
               <Link
                 to={`/book/${selectedMistriId}`}
                 className="w-full">
-                <Button className="w-full bg-black py-6">Continue</Button>
+                <Button className="w-full bg-black py-6">Book now</Button>
               </Link>
             </div>
           </div>

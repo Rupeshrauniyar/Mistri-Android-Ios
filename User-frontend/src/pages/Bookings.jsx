@@ -56,9 +56,7 @@ const Bookings = () => {
   return (
     <>
       <div className="w-full overflow-y-auto h-full pb-[100px]">
-        {
-          console.log(selectedLink)
-        }
+        {console.log(selectedLink)}
         <SimplePullToRefresh onRefresh={handleRefresh}>
           {userLoading ? (
             <div className="w-full h-full flex items-center justify-center">
@@ -99,6 +97,7 @@ const Bookings = () => {
                         .map((acceptedOrder) => (
                           <div
                             key={acceptedOrder._id}
+                            className={`${selectedOrder === acceptedOrder._id ? "ring-2 ring-black" : ""} rounded-md  transition-all `}
                             onClick={() => {
                               setSelectedOrder(acceptedOrder._id);
                             }}>
@@ -146,7 +145,7 @@ const Bookings = () => {
         <motion.div
           initial={{opacity: 0}}
           animate={{opacity: 1}}
-          className="sm:w-full xl:w-[80%] fixed xl:bottom-0 sm:bottom-[60px] right-0 text-2xl font-bold z-50">
+          className="sm:w-full xl:w-[81%] fixed xl:bottom-0 sm:bottom-[60px] right-0 text-2xl font-bold z-50">
           <Link to={`/bookings/active/${selectedLink}`}>
             <Button className="w-full h-[50px]">Continue</Button>
           </Link>

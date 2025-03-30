@@ -149,21 +149,21 @@ const Book = () => {
   return (
     <>
       {/* <ToastContainer position="top-center" /> */}
-      <div className="h-full bg-gradient-to-b from-gray-50 to-gray-100  w-full overflow-hidden pb-[70px]">
+      <div className="h-full bg-gradient-to-b from-gray-50 to-gray-100  w-full overflow-hidden pb-[70px] my-4">
         {/* Header */}
     
         {/* Back Button */}
         <div className=" pt-3">
-          <Button
+          <button
             onClick={() => navigate(-1)}
-            variant="ghost"
-            className="flex items-center text-gray-600 hover:text-black transition-colors duration-200">
-            <ArrowLeft className="w-4 h-4" />
+            
+            className="ml-4 flex items-center text-gray-600 hover:text-black transition-colors duration-200">
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back
-          </Button>
+          </button>
         </div>
 
-        <div className="max-w-3xl  px-4 overflow-y-auto h-full pb-[200px]">
+        <div className="w-full  px-4 overflow-y-auto h-full pb-[200px]">
           {/* Mistri Card */}
           <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6 transform transition-all duration-300 hover:shadow-lg ">
             <div className="bg-gradient-to-r from-gray-900 to-black text-white p-6">

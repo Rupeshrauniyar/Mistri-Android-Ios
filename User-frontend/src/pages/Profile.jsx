@@ -3,7 +3,7 @@ import {userContext} from "@/context/Auth.context";
 import PageHeader from "@/components/ui/PageHeader";
 import {Button} from "@/components/ui/button";
 import {Link} from "react-router-dom";
-import {User, Mail, Phone, MapPin, Clock, CheckCircle, XCircle, History, LogOut, Settings} from "lucide-react";
+import {User, Mail, Phone, MapPin, Clock, CheckCircle, XCircle, History, LogOut, Settings, Pen} from "lucide-react";
 import SimplePullToRefresh from "@/components/SimplePullToRefresh";
 
 const Profile = () => {
@@ -42,13 +42,28 @@ const Profile = () => {
         {/* Profile Card */}
         <SimplePullToRefresh onRefresh={handleRefresh}>
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold">
-                {user.username?.charAt(0).toUpperCase()}
+            <div className="w-full flex items-center justify-between">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                  {user.username?.charAt(0).toUpperCase()}
+                </div>
+
+                <div>
+                  <h2 className="text-2xl font-bold">{user.username}</h2>
+                  <p className="text-gray-500">Member since {new Date(user.createdAt).toLocaleDateString()}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold">{user.username}</h2>
-                <p className="text-gray-500">Member since {new Date(user.createdAt).toLocaleDateString()}</p>
+
+              <div className="sm:hidden xl:block flex items-center space-x-4 mb-10">
+                <Link to="edit-profile">
+                  <Button className="w-full bg-black text-white hover:bg-gray-800">
+                    <Pen
+                      size={20}
+                      className="mr-2"
+                    />
+                    Edit profile
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -70,6 +85,17 @@ const Profile = () => {
                 <MapPin size={20} />
                 <span>{user.address}</span>
               </div>
+            </div>
+            <div className="xl:hidden sm:block flex items-center space-x-4 mt-2">
+              <Link to="edit-profile">
+                <Button className="w-full bg-black text-white hover:bg-gray-800">
+                  <Pen
+                    size={20}
+                    className="mr-2"
+                  />
+                  Edit profile
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -113,7 +139,6 @@ const Profile = () => {
           </div>
         </SimplePullToRefresh>
       </div>
-     
     </div>
   );
 };

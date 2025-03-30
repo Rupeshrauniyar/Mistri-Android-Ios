@@ -48,7 +48,7 @@ const MistriComponent = (props) => {
   };
   return (
     <div className="noScroll w-full h-full  flex flex-wrap sm:pb-10">
-      {console.log(props)}
+  
       {/*  */}
       {props ? (
         props.mistris

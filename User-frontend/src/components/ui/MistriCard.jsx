@@ -1,7 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Star, MapPin, Clock, IndianRupee, Phone } from "lucide-react";
+import React, {useState} from "react";
+import {Link} from "react-router-dom";
+import {Button} from "@/components/ui/button";
+import {Star, MapPin, Clock, IndianRupee, Phone} from "lucide-react";
 
 /**
  * MistriCard component for displaying individual mistri information
@@ -13,21 +13,23 @@ import { Star, MapPin, Clock, IndianRupee, Phone } from "lucide-react";
  * @param {Function} props.onSelect - Function to call when card is selected
  * @param {Object} props.user - Current user data
  */
-const MistriCard = ({ mistri, showBookingBtns, isSelected, onSelect, user }) => {
-  // Random rating between 4.0 and 5.0
-  const rating = (4 + Math.random()).toFixed(1);
+const MistriCard = ({mistri, showBookingBtns, isSelected, onSelect, user}) => {
+  const [selectMistri, setSelectMistri] = useState();
+  const HandleSelect = (mistriId) => {
+    setSelectMistri(mistriId);
+    onSelect(mistriId);
+  };
 
   return (
     <div
-      onClick={() => onSelect(mistri._id)}
+      onClick={() => HandleSelect(mistri._id)}
       className={`
         relative bg-white rounded-xl overflow-hidden transition-all duration-300
         ${isSelected ? "ring-2 ring-black" : "hover:shadow-lg"}
         sm:w-full xl:w-[280px] xl:h-[300px] cursor-pointer mb-4 xl:mr-4
-      `}
-    >
+      `}>
       {/* Image Section */}
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden z-5">
         <img
           src={mistri.profileImage}
           alt={mistri.mistriname}
@@ -71,43 +73,28 @@ const MistriCard = ({ mistri, showBookingBtns, isSelected, onSelect, user }) => 
         </div>
 
         {/* Booking Button - Desktop */}
-        <div className="sm:hidden xl:block">
-          {showBookingBtns && (
-            <div className="w-full">
-              {user && user.orders.some((order) => order.mistri === mistri?._id) ? (
-                <Link to="/bookings" className="w-full">
-                  <Button 
-                    className="w-full bg-gray-900 hover:bg-black text-white transition-colors"
-                  >
-                    View Booking
-                  </Button>
+        <div className="absolute"></div>
+        {selectMistri ? (
+          <div className="xl:w-[80.8%] sm:w-full fixed xl:bottom-0 sm:bottom-[66px] right-0 z-[100]">
+            {showBookingBtns && (
+              <div className="w-full">
+                <Link
+                  to={`/book/${selectMistri}`}
+                  className="w-full">
+                  <Button className="flex w-full bg-black hover:bg-gray-900 text-white transition-colors py-6">Book Now</Button>
                 </Link>
-              ) : (
-                <Link to={`/book/${mistri._id}`} className="w-full">
-                  <Button 
-                    className="w-full bg-black hover:bg-gray-900 text-white transition-colors"
-                  >
-                    Book Now
-                  </Button>
-                </Link>
-              )}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
 
       {/* Tags */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2">
-        {mistri.isVerified && (
-          <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-            Verified
-          </span>
-        )}
-        {mistri.isAvailable && (
-          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-            Available
-          </span>
-        )}
+      <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+        {mistri.isVerified && <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Verified</span>}
+        {mistri.isAvailable && <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Available</span>}
       </div>
     </div>
   );

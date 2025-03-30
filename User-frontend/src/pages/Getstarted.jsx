@@ -25,11 +25,13 @@ const GetStarted = () => {
   };
   useEffect(() => {
     if (currentStep > 2) {
-      // localStorage.setItem("onboardingCompleted", "true");
+      localStorage.setItem("onboardingCompleted", "true");
     }
   });
   const handleContinueAsGuest = () => {
     localStorage.setItem("onboardingCompleted", "true");
+    localStorage.setItem("user", "guest");
+
     // Use replace instead of push to avoid adding to history stack
     navigate("/", {replace: true});
   };
@@ -39,7 +41,6 @@ const GetStarted = () => {
     {
       title: "Welcome to Mistri",
       description: "Find the best professionals for all your home service needs",
-      image: "https://img.icons8.com/color/240/000000/worker-with-hardhat.png",
       canProceed: true,
     },
     // Terms and Policy slide
