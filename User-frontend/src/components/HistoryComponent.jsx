@@ -62,7 +62,7 @@ const HistoryComponent = ({showNavbar}) => {
               placeholder="Search by mistri name or profession..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-black dark:text-white"
             />
           </div>
 

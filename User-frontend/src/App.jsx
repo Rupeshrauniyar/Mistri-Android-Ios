@@ -10,7 +10,7 @@ const App = () => {
  
 
   return (
-    <div className="w-full h-full bg-zinc-200">
+    <div className="w-full h-full">
       <AuthProvider>
         <MistrisProvider>
           <ActiveOrdersProvider>

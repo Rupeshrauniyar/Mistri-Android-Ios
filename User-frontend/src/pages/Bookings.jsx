@@ -56,7 +56,6 @@ const Bookings = () => {
   return (
     <>
       <div className="w-full overflow-y-auto h-full pb-[100px]">
-        {console.log(selectedLink)}
         <SimplePullToRefresh onRefresh={handleRefresh}>
           {userLoading ? (
             <div className="w-full h-full flex items-center justify-center">
@@ -80,7 +79,7 @@ const Bookings = () => {
                     placeholder="Search by mistri name or profession..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-black dark:text-white"
                   />
                 </div>
                 {filteredHistory?.length > 0 ? (

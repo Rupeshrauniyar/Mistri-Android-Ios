@@ -25,7 +25,7 @@ const Orders = ({order}) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-4 transition-all hover:shadow-md ">
+    <div className="dark:bg-zinc-900 dark:text-white bg-white rounded-lg shadow-sm p-4 mb-4 transition-all hover:shadow-md ">
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center space-x-3">
           <img

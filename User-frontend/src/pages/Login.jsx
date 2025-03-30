@@ -7,7 +7,7 @@ const Login = () => {
   return (
     <>
       
-      <div className="flex flex-col items-center justify-center w-full">
+      <div className="flex flex-col items-center justify-center w-full h-full">
         <LoginComp doRedirect={true} setHidden={false} />
       </div>
     </>

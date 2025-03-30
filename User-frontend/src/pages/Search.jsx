@@ -208,136 +208,135 @@ const Search = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hidden">
+    <div className="flex flex-col min-h-screen overflow-y-auto dark:bg-black dark:text-white">
       {/* Fixed Header */}
-      <SimplePullToRefresh onRefresh={() => handleRefresh()}>
-        <div className="flex-shrink-0 bg-white shadow-md z-30">
-          {/* Search Controls */}
-          <div className="p-4">
-            {/* Back Button */}
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center text-gray-600 hover:text-black transition-colors duration-200 mb-3">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </button>
 
-            {/* Search Input */}
-            <div className="flex items-center bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="pl-4 text-gray-400">
-                <SearchIcon className="w-5 h-5" />
+      <div className="flex-shrink-0 bg-white dark:bg-zinc-900 shadow-md z-30">
+        {/* Search Controls */}
+        <div className="p-4">
+          {/* Back Button */}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-600 hover:text-black transition-colors duration-200 mb-3">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </button>
+
+          {/* Search Input */}
+          <div className="flex items-center bg-white dark:bg-zinc-900 dark:text-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="pl-4 text-gray-400">
+              <SearchIcon className="w-5 h-5" />
+            </div>
+            <input
+              type="text"
+              value={searchedVal}
+              onChange={(e) => searchFnc(e.target.value)}
+              placeholder="Search for services..."
+              className="w-full py-3 px-3 focus:outline-none dark:bg-zinc-900 dark:text-white "
+            />
+            {searchedVal && (
+              <button
+                onClick={handleClearSearch}
+                className="pr-4 text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-grow overflow-y-auto dark:bg-black bg-gray-50">
+        <div className="w-full mx-auto px-4 py-4">
+          {/* Search Suggestions */}
+          {allowSuggestions && searchFilter.length > 0 && (
+            <div className="mb-4">
+              <div className="bg-white dark:bg-zinc-900 dark:text-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+                {searchFilter.map((search, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleSearchSubmit(search)}
+                    className="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150">
+                    <span className="bg-gray-100 rounded-full p-2 mr-3 flex items-center justify-center">
+                      <SearchIcon className="w-4 h-4 text-gray-600" />
+                    </span>
+                    <p className="text-gray-700">{search}</p>
+                  </div>
+                ))}
               </div>
-              <input
-                type="text"
-                value={searchedVal}
-                onChange={(e) => searchFnc(e.target.value)}
-                placeholder="Search for services..."
-                className="w-full py-3 px-3 focus:outline-none"
-              />
-              {searchedVal && (
-                <button
-                  onClick={handleClearSearch}
-                  className="pr-4 text-gray-400 hover:text-gray-600">
-                  <X className="w-5 h-5" />
+            </div>
+          )}
+
+          {/* Popular Categories */}
+          {allowSuggestions && !searchQuery && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-3">Popular Categories</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {popularCategories.map((category, index) => (
+                  <Link
+                    key={index}
+                    to={`/search?q=${category}`}
+                    className="bg-white dark:bg-zinc-900 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200 flex items-center">
+                    <span className="dark:text-white  text-gray-800 truncate">{category}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Search Results */}
+          {!allowSuggestions && (
+            <div>
+              {/* Results Header */}
+              <div className="flex items-center justify-between mb-4 dark:text-white ">
+                <h2 className="text-lg font-semibold">
+                  {loading ? "Searching..." : mistris.length > 0 ? `Results for "${searchQuery}"` : `No results for "${searchQuery}"`}
+                </h2>
+
+                <button className="flex items-center text-gray-600 bg-white dark:bg-zinc-900 dark:text-white px-3 py-2 rounded-lg shadow-sm hover:bg-gray-50">
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filter
                 </button>
+              </div>
+
+              {/* Loading State */}
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="w-10 h-10 text-black animate-spin mb-4" />
+                  <p className="text-gray-600">Searching for professionals...</p>
+                </div>
+              ) : mistris.length > 0 ? (
+                <div className="pb-[50px]">
+                  <MistriList
+                    mistris={mistris}
+                    showBookingBtns={true}
+                  />
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-zinc-900 dark:text-white rounded-xl shadow-sm p-6 text-center">
+                  <div className="w-16 h-16 dark:bg-black bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <SearchIcon className="w-8 h-8 dark:text-white  text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-800 mb-2">No results found</h3>
+                  <p className="text-gray-600 mb-4">We couldn't find any professionals matching "{searchQuery}".</p>
+                  <p className="text-gray-600">Try checking your spelling or using more general terms.</p>
+                </div>
               )}
             </div>
-          </div>
+          )}
+
+          {/* Error State */}
+          {error && searchedVal && (
+            <div className="bg-white dark:bg-zinc-900 dark:text-white rounded-xl shadow-sm p-6 text-center mt-4">
+              <h3 className="text-lg font-medium text-gray-800 mb-2">No suggestions found for "{searchedVal}"</h3>
+              <p className="text-gray-600">Try checking your spelling or using more general terms.</p>
+            </div>
+          )}
+
+          {/* Bottom Spacer for Mobile */}
+          <div className="h-20"></div>
         </div>
-
-        {/* Scrollable Content */}
-        <div className="flex-grow overflow-y-auto bg-gray-50">
-          <div className="w-full mx-auto px-4 py-4">
-            {/* Search Suggestions */}
-            {allowSuggestions && searchFilter.length > 0 && (
-              <div className="mb-4">
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-                  {searchFilter.map((search, i) => (
-                    <div
-                      key={i}
-                      onClick={() => handleSearchSubmit(search)}
-                      className="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150">
-                      <span className="bg-gray-100 rounded-full p-2 mr-3 flex items-center justify-center">
-                        <SearchIcon className="w-4 h-4 text-gray-600" />
-                      </span>
-                      <p className="text-gray-700">{search}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Popular Categories */}
-            {allowSuggestions && !searchQuery && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Popular Categories</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {popularCategories.map((category, index) => (
-                    <Link
-                      key={index}
-                      to={`/search?q=${category}`}
-                      className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200 flex items-center">
-                      <span className="text-gray-800 truncate">{category}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Search Results */}
-            {!allowSuggestions && (
-              <div>
-                {/* Results Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">
-                    {loading ? "Searching..." : mistris.length > 0 ? `Results for "${searchQuery}"` : `No results for "${searchQuery}"`}
-                  </h2>
-
-                  <button className="flex items-center text-gray-600 bg-white px-3 py-2 rounded-lg shadow-sm hover:bg-gray-50">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </button>
-                </div>
-
-                {/* Loading State */}
-                {loading ? (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <Loader2 className="w-10 h-10 text-black animate-spin mb-4" />
-                    <p className="text-gray-600">Searching for professionals...</p>
-                  </div>
-                ) : mistris.length > 0 ? (
-                  <div className="pb-[50px]">
-                    <MistriList
-                      mistris={mistris}
-                      showBookingBtns={true}
-                    />
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <SearchIcon className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-800 mb-2">No results found</h3>
-                    <p className="text-gray-600 mb-4">We couldn't find any professionals matching "{searchQuery}".</p>
-                    <p className="text-gray-600">Try checking your spelling or using more general terms.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Error State */}
-            {error && searchedVal && (
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center mt-4">
-                <h3 className="text-lg font-medium text-gray-800 mb-2">No suggestions found for "{searchedVal}"</h3>
-                <p className="text-gray-600">Try checking your spelling or using more general terms.</p>
-              </div>
-            )}
-
-            {/* Bottom Spacer for Mobile */}
-            <div className="h-20"></div>
-          </div>
-        </div>
-      </SimplePullToRefresh>
+      </div>
     </div>
   );
 };

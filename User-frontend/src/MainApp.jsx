@@ -19,6 +19,8 @@ import Book from "./pages/Book.jsx";
 import History from "./pages/History.jsx";
 import Profile from "./pages/Profile.jsx";
 import GetStarted from "./pages/Getstarted.jsx";
+import Notification from "./pages/Notification.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
 // Components
 
 import Navbar from "./components/Navbar.jsx";
@@ -29,9 +31,10 @@ import BookingsOther from "./components/BookingsOther.jsx";
 import HistoryComponent from "./components/HistoryComponent.jsx";
 import ScrollComponent from "./components/ScrollComponent.jsx";
 import SimplePullToRefresh from "./components/SimplePullToRefresh.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 function MainApp() {
-  const {user, userLoading} = useContext(userContext);
+  const {user, userLoading, theme, setTheme} = useContext(userContext);
   const [onboardingCompleted, setOnboardingCompleted] = useState(null);
 
   const navigate = useNavigate();
@@ -72,12 +75,12 @@ function MainApp() {
   }
 
   // Hide navbars on getstarted, login, and register pages
-  const hideNavbarPaths = ["/getstarted", "/login", "/register"];
+  const hideNavbarPaths = ["/getstarted", "/login", "/register", "/forgot-password"];
   const showNavbars = !hideNavbarPaths.includes(location.pathname);
 
   return (
     <>
-      <div className="w-full h-screen flex overflow-hidden dark:bg-black dark:text-white bg-zinc-100 text-black">
+      <div className={`w-full h-screen flex overflow-hidden ${theme === "dark" ? "dark bg-black text-zinc-100" : " light bg-zinc-100 text-black"}`}>
         {showNavbars && <Navbar />}
 
         <div className={`flex flex-col ${showNavbars ? "xl:w-[85%] sm:w-full" : "w-full"} h-screen overflow-hidden`}>
@@ -104,7 +107,14 @@ function MainApp() {
                   path="/getstarted"
                   element={<GetStarted />}
                 />
-
+                <Route
+                  path="/reset-password/:token/:otp/:id"
+                  element={<ResetPassword />}
+                />
+                <Route
+                  path="/forgot-password"
+                  element={<ForgotPassword />}
+                />
                 {/* done */}
                 <Route
                   path="/logout"
@@ -112,6 +122,11 @@ function MainApp() {
                 />
                 {/* done */}
                 <Route element={<IsLoggedin />}>
+                  <Route
+                    path="/notifications"
+                    element={<Notification />}
+                  />
+
                   <Route
                     path="/bookings"
                     element={<Bookings />}

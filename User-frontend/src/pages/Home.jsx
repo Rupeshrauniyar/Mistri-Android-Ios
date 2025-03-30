@@ -97,7 +97,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="flex flex-col w-full h-full bg-zinc-100 p-4 overflow-y-auto sm:pb-[130px] xl:pb-[200px] mt-4 ">
+          <div className="flex flex-col w-full h-full p-4 overflow-y-auto sm:pb-[130px] xl:pb-[200px] mt-4 ">
             <PageHeader
               title="Discover Mistris."
               subtitle="Find best and pocket friendly Mistris."
@@ -105,7 +105,7 @@ const Home = () => {
             <Link
               to={"/search"}
               className="flex mt-4">
-              <Search />
+              <div className="dark:bg-zinc-900 dark:text-white bg-white text-black w-full h-[50px] flex items-center px-4 rounded-lg mb-2">Search</div>
             </Link>
 
             <motion.div
@@ -123,7 +123,7 @@ const Home = () => {
                   <>
                     <MistriList
                       mistris={mistris}
-                      showBookingBtns={true}
+                      showBookingBtns={false}
                       onSelectMistri={handleSelectMistri}
                     />
                   </>
@@ -180,7 +180,7 @@ const Home = () => {
               <Link
                 to={`/book/${selectedMistriId}`}
                 className="w-full">
-                <Button className="w-full bg-black py-6">Book now</Button>
+                <Button className="w-full dark:bg-zinc-800 bg-black py-7">Book now</Button>
               </Link>
             </div>
           </div>

@@ -8,14 +8,14 @@ const TopNavbar = () => {
 
   return (
     <>
-      <div className="fixed top-0 left-0 w-full bg-white z-[999] shadow-md rounded-b-2xl">
+      <div className="fixed top-0 left-0 w-full dark:bg-zinc-900 dark:text-white text-black bg-white z-[999] shadow-md rounded-b-2xl">
         <div className="max-w-full ">
           <div className="flex items-center justify-between py-3 xl:px-6 sm:px-2">
             {/* Left side - User info */}
             <div className="flex items-center space-x-3">
               <div className="relative">
                 {user ? (
-                  <div className="w-10 h-10 bg-gradient-to-br from-black to-gray-700 text-white rounded-full flex items-center justify-center font-bold shadow-md">
+                  <div className="w-10 h-10 bg-gradient-to-br from-black to-gray-700  rounded-full flex items-center justify-center font-bold shadow-md">
                     {user?.username?.charAt(0).toUpperCase()}
                   </div>
                 ) : (
@@ -33,11 +33,11 @@ const TopNavbar = () => {
               <div className="flex flex-col">
                 {user ? (
                   <>
-                    <p className="font-medium text-gray-800">{user.username}</p>
+                    <p className="font-medium dark:text-zinc-200 text-gray-800">{user.username}</p>
                   </>
                 ) : (
                   <Link to="/login">
-                    <button className="font-medium text-white-500 bg-black text-white px-4 py-2 rounded-full">Login</button>
+                    <button className="font-medium -500 bg-black  px-4 py-2 rounded-full">Login</button>
                   </Link>
                 )}
               </div>
@@ -47,23 +47,21 @@ const TopNavbar = () => {
             <div className="flex items-center space-x-4">
               <Link
                 to="/search"
-                className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200">
-                <Search className="w-5 h-5 text-gray-700" />
+                className="flex items-center justify-center w-10 h-10 dark:bg-zinc-800 dark:text-white dark:hover:bg-gray-700 bg-gray-100 text-gray-700 rounded-full  hover:bg-gray-200 transition-colors duration-200">
+                <Search className="w-5 h-5 " />
               </Link>
 
               <Link
                 to="/notifications"
-                className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200 relative">
-                <Bell className="w-5 h-5 text-gray-700" />
+                className="flex items-center justify-center dark:bg-zinc-800 dark:text-white dark:hover:bg-gray-700 bg-gray-100 text-gray-700 w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200 relative">
+                <Bell className="w-5 h-5 " />
                 {user && <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>}
               </Link>
 
-             
-
               <Link
                 to={"/settings"}
-                className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200">
-                <Menu className="w-5 h-5 text-gray-700" />
+                className="dark:bg-zinc-800 dark:text-white dark:hover:bg-gray-700 bg-gray-100 text-gray-700 flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-200">
+                <Menu className="w-5 h-5 " />
               </Link>
             </div>
           </div>

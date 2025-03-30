@@ -1,24 +1,24 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, {useState, useEffect, createContext} from "react";
 import axios from "axios";
 
 export const userContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({children}) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [lastOnlineCheck, setLastOnlineCheck] = useState(null);
-
+  const [theme, setTheme] = useState(localStorage.getItem("theme") ? localStorage.getItem("theme") : "light");
   // Get data from localStorage
   const getLocalData = () => {
     try {
       const localUser = JSON.parse(localStorage.getItem("user"));
       const token = localStorage.getItem("token");
-      return { localUser, token };
+      return {localUser, token};
     } catch (error) {
       console.error("Error parsing local user data:", error);
-      return { localUser: null, token: null };
+      return {localUser: null, token: null};
     }
   };
 
@@ -27,18 +27,18 @@ export const AuthProvider = ({ children }) => {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
   // Initialize user from localStorage
   useEffect(() => {
-    const { localUser } = getLocalData();
+    const {localUser} = getLocalData();
     if (localUser) {
       setUser(localUser);
       setUserLoading(false);
@@ -47,8 +47,8 @@ export const AuthProvider = ({ children }) => {
 
   // Check user authentication status
   const CheckUser = async () => {
-    const { localUser, token } = getLocalData();
-    
+    const {localUser, token} = getLocalData();
+
     if (!token) {
       setUser(null);
       setUserLoading(false);
@@ -65,8 +65,8 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.post(`${backendUrl}/user/check`, { token });
-      
+      const response = await axios.post(`${backendUrl}/user/check`, {token});
+
       if (response.data.status === "OK" && response.data.user) {
         // Update local storage with fresh data
         localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
       if (localUser && token) {
         setUser(localUser);
         if (!isOffline) {
-                  }
+        }
       } else {
         setUser(null);
       }
@@ -95,8 +95,8 @@ export const AuthProvider = ({ children }) => {
 
   // Check user when online status changes or token changes
   useEffect(() => {
-    const { token } = getLocalData();
-    
+    const {token} = getLocalData();
+
     // Don't check if we're offline and have recent data
     if (isOffline && lastOnlineCheck && Date.now() - lastOnlineCheck < 300000) {
       return;
@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <userContext.Provider 
+    <userContext.Provider
       value={{
         user,
         setUser,
@@ -133,9 +133,10 @@ export const AuthProvider = ({ children }) => {
         isOffline,
         login,
         logout,
-        CheckUser
-      }}
-    >
+        CheckUser,
+        theme,
+        setTheme,
+      }}>
       {children}
     </userContext.Provider>
   );

@@ -6,25 +6,38 @@ import PageHeader from "@/components/ui/PageHeader";
 
 const Settings = () => {
   const {user} = useContext(userContext);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "light" ? false : true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
-
+  const {theme, setTheme} = useContext(userContext);
   const toggleDarkMode = () => {
-    localStorage.setItem("dark", true);
+    localStorage.setItem("theme", "dark");
     // Here you would implement the actual dark mode logic
+    setTheme("dark");
   };
-
+  const toggleLightMode = () => {
+    localStorage.setItem("theme", "light");
+    setTheme("light");
+  };
+  const handleToggle = (label) => {
+    if (theme === "light") {
+      toggleDarkMode();
+      setDarkMode(true);
+    } else {
+      toggleLightMode();
+      setDarkMode(false);
+    }
+  };
   const settingsGroups = [
     {
       title: "Appearance",
       items: [
         {
           icon: darkMode ? Moon : Sun,
-          label: "Dark Mode",
+          label: "Dark mode",
           isToggle: true,
           value: darkMode,
-          onChange: toggleDarkMode,
+          onChange: () => handleToggle(),
         },
       ],
     },
@@ -64,15 +77,9 @@ const Settings = () => {
       ],
     },
   ];
-  const handleToggle = (label) => {
-    console.log(label);
-    if (label === "Dark Mode") {
-      toggleDarkMode();
-    } else {
-    }
-  };
+
   return (
-    <div className="w-full min-h-screen bg-white mt-3 pb-[100px]">
+    <div className="w-full min-h-screen dark:bg-black  mt-3 pb-[100px]">
       <div className="px-2"></div>
 
       <div className="p-4">
@@ -81,7 +88,7 @@ const Settings = () => {
             key={groupIndex}
             className="mb-8">
             <h2 className="text-lg font-semibold mb-4 px-2">{group.title}</h2>
-            <div className="bg-white rounded-xl">
+            <div className=" rounded-xl">
               {group.items.map((item, itemIndex) => (
                 <div
                   key={itemIndex}
@@ -93,13 +100,13 @@ const Settings = () => {
 
                   {item.isToggle ? (
                     <button
-                      onClick={() => handleToggle(item.label)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${
-                        item.value ? "bg-black" : "bg-gray-200"
+                      onClick={item.onChange}
+                      className={`relative dark:bg-white bg-black inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${
+                        item.value ? "" : ""
                       }`}>
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out ${
-                          item.value ? "translate-x-6" : "translate-x-1"
+                        className={`inline-block dark:bg-black  bg-white h-4 w-4 transform rounded-full  transition duration-200 ease-in-out ${
+                          item.value ? "translate-x-6 " : "translate-x-1"
                         }`}
                       />
                     </button>

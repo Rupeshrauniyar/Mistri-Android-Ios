@@ -6,8 +6,10 @@ const authController = require("../controllers/user.auth.controller.js")
 
 router.post("/login", authController.loginController)
 router.post("/register", authController.registerController)
-router.get("/verify", authController.verifyController)
-router.get("/reset", authController.resetController)
+router.post("/reset-password", authController.verifyPasswordResetController)
+router.post("/forgot-password", authController.forgotPasswordController)
+router.post("/update-password", authController.passwordResetController)
+
 
 
 

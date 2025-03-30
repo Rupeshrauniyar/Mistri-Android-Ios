@@ -151,11 +151,11 @@ const LoginComp = (props) => {
   }
 
   return (
-    <div className="w-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="w-full h-full max-w-md">
+    <div className="w-full h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:bg-black dark:text-white bg-gray-50">
+      <div className="w-full h-full max-w-md flex flex-col item-center justify-center">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to your account to continue</p>
+          <h2 className="text-3xl font-extrabold dark:text-gray-200 text-gray-900">Welcome back</h2>
+          <p className="mt-2 text-sm dark:text-gray-300 text-gray-600">Sign in to your account to continue</p>
         </div>
 
         <form
@@ -175,7 +175,7 @@ const LoginComp = (props) => {
               <div key={index}>
                 <label
                   htmlFor={field.name}
-                  className="block text-sm font-medium text-gray-700">
+                  className="block text-sm font-medium dark:text-white text-gray-700">
                   {field.label}
                 </label>
                 <div className="mt-1 relative">
@@ -185,7 +185,7 @@ const LoginComp = (props) => {
                     name={field.name}
                     type={field.type}
                     onChange={handleInput}
-                    className={`appearance-none block w-full pl-10 pr-3 py-3 border ${
+                    className={`appearance-none dark:text-black dark:bg-black block w-full pl-10 pr-3 py-3 border ${
                       fieldErrors[field.name] ? "border-red-500" : "border-gray-300"
                     } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
                     placeholder={field.placeholder}
@@ -198,17 +198,17 @@ const LoginComp = (props) => {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <span className="text-gray-600">Create an account? </span>
+              <span className="dark:text-white text-gray-600">Create an account? </span>
               <Link
                 to="/register"
-                className="font-medium text-black hover:text-gray-800 transition-colors">
+                className="font-medium dark:text-white text-black hover:text-gray-800 transition-colors">
                 Sign up
               </Link>
             </div>
             <div className="text-sm">
               <Link
                 to="/forgot-password"
-                className="font-medium text-black hover:text-gray-800 transition-colors">
+                className="font-medium dark:text-white text-black hover:text-gray-800 transition-colors">
                 Forgot password?
               </Link>
             </div>
@@ -217,7 +217,7 @@ const LoginComp = (props) => {
           <button
             type="submit"
             disabled={loading || isRedirecting}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white dark:bg-zinc-900 bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
             {loading || isRedirecting ? (
               <div className="flex items-center">
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />

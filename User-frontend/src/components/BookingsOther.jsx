@@ -34,9 +34,8 @@ const BookingsOther = () => {
   };
   return (
     <>
-      
       <SimplePullToRefresh onRefresh={handleRefresh}>
-        <div className="w-full overflow-y-auto h-full bg-zinc-100 pb-[100px]">
+        <div className="w-full overflow-y-auto h-full dark:bg-black bg-zinc-100 pb-[100px]">
           {userLoading ? (
             <div>Loading...</div>
           ) : (
@@ -48,7 +47,7 @@ const BookingsOther = () => {
                   placeholder="Search by mistri name or profession..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-black dark:text-white"
                 />
               </div>
 

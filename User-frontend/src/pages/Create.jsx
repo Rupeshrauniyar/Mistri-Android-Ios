@@ -238,12 +238,12 @@ const Create = () => {
   }
 
   return (
-    <div className="w-full min-h-full bg-gray-50  overflow-y-auto ">
+    <div className="w-full min-h-full dark:bg-black text-white bg-gray-50  overflow-y-auto ">
       <SimplePullToRefresh onRefresh={handleRefresh}>
         <div className="p-4 ">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 hover:text-black transition-colors duration-200">
+            className="flex items-center dark:text-white text-gray-600 hover:text-black transition-colors duration-200">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </button>
@@ -251,32 +251,32 @@ const Create = () => {
         <div className="max-w-3xl mx-auto px-4 pb-[120px]">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Create an Order</h1>
-            <p className="text-gray-600 mt-2">Find the best professionals at your preferred price</p>
+            <h1 className="text-3xl font-bold dark:text-white text-gray-900">Create an Order</h1>
+            <p className="dark:text-gray-200 text-gray-600 mt-2">Find the best professionals at your preferred price</p>
           </div>
 
           {/* Form Container */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+          <div className="dark:bg-zinc-900 bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div className="p-6">
               {/* Charges Input */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium dark:text-gray-100 text-gray-700 dark:text-gray-100 mb-2">
                   <div className="flex items-center">
-                    <IndianRupee className="w-4 h-4 mr-2 text-gray-500" />
-                    Service Charge (per hour)
+                    <IndianRupee className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-200" />
+                    Service Charge 
                   </div>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500">₹</span>
+                    <span className="text-gray-500 dark:text-gray-200">₹</span>
                   </div>
                   <input
                     type="number"
                     placeholder="Enter amount"
                     value={formData.Charges || ""}
                     onChange={(e) => handleInputChange("Charges", e.target.value)}
-                    className={`w-full pl-8 pr-3 py-3 border ${
-                      errors.Charges ? "border-red-500" : "border-gray-300"
+                    className={`w-full dark:bg-black pl-8 pr-3 py-3 border ${
+                      errors.Charges ? "border-red-500" : " border-gray-300 dark:border-zinc-800"
                     } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
                   />
                 </div>
@@ -287,9 +287,9 @@ const Create = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {/* Date Input */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                      <Calendar className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-200" />
                       Appointment Date
                     </div>
                   </label>
@@ -298,8 +298,8 @@ const Create = () => {
                     value={formData.Date || ""}
                     onChange={(e) => handleInputChange("Date", e.target.value)}
                     min={new Date().toISOString().split("T")[0]}
-                    className={`w-full p-3 border ${
-                      errors.Date ? "border-red-500" : "border-gray-300"
+                    className={`w-full dark:bg-black dark:text-white text-black p-3 border ${
+                      errors.Date ? "border-red-500" : "border-gray-300 dark:border-zinc-800"
                     } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
                   />
                   {errors.Date && <p className="mt-1 text-sm text-red-500">{errors.Date}</p>}
@@ -307,9 +307,9 @@ const Create = () => {
 
                 {/* Time Input */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
                     <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
+                      <Clock className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-200" />
                       Appointment Time
                     </div>
                   </label>
@@ -317,8 +317,8 @@ const Create = () => {
                     type="time"
                     value={formData.Time || ""}
                     onChange={(e) => handleInputChange("Time", e.target.value)}
-                    className={`w-full p-3 border ${
-                      errors.Time ? "border-red-500" : "border-gray-300"
+                    className={`w-full dark:bg-black dark:text-white text-black dark:text-white text-black p-3 border ${
+                      errors.Time ? "border-red-500" : "border-gray-300 dark:border-zinc-800"
                     } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
                   />
                   {errors.Time && <p className="mt-1 text-sm text-red-500">{errors.Time}</p>}
@@ -327,17 +327,17 @@ const Create = () => {
 
               {/* Profession Selection */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">
                   <div className="flex items-center">
-                    <Briefcase className="w-4 h-4 mr-2 text-gray-500" />
+                    <Briefcase className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-200" />
                     Select Professional Type
                   </div>
                 </label>
                 <select
                   value={formData.Profession || ""}
                   onChange={(e) => handleInputChange("Profession", e.target.value)}
-                  className={`w-full p-3 border ${
-                    errors.Profession ? "border-red-500" : "border-gray-300"
+                  className={`w-full dark:bg-black dark:text-white text-black p-3 border ${
+                    errors.Profession ? "border-red-500" : "border-gray-300 dark:border-zinc-800"
                   } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 appearance-none bg-white`}>
                   <option value="">Select a profession</option>
                   {MistriOptions.map((profession, i) => (
@@ -353,15 +353,15 @@ const Create = () => {
 
               {/* Popular Professions */}
               <div className="mb-6">
-                <p className="text-sm font-medium text-gray-700 mb-2">Popular Choices:</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-100 mb-2">Popular Choices:</p>
                 <div className="flex flex-wrap gap-2">
                   {popularProfessions.map((profession, index) => (
                     <button
                       key={index}
                       type="button"
                       onClick={() => handleInputChange("Profession", profession)}
-                      className={`px-3 py-2 text-sm rounded-full ${
-                        formData.Profession === profession ? "bg-black text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      className={`px-3 dark:bg-black py-2 text-sm rounded-full ${
+                        formData.Profession === profession ? "bg-black text-white" : "bg-gray-100 text-gray-700 dark:text-gray-100 hover:bg-gray-200"
                       } transition-colors duration-200`}>
                       {profession}
                     </button>
@@ -371,7 +371,7 @@ const Create = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="px-6 py-4 bg-gray-50 border-t">
+            <div className="px-6 py-4 dark:bg-zinc-900 bg-gray-50 border-t">
               <button
                 onClick={createOrder}
                 disabled={isSubmitting}
@@ -391,7 +391,7 @@ const Create = () => {
           </div>
 
           {/* Information Card */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+          <div className="dark:bg-zinc-900 dark:text-white bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div className="p-6 border-b">
               <h2 className="text-lg font-semibold">How it works</h2>
             </div>
@@ -399,19 +399,19 @@ const Create = () => {
               <ol className="space-y-4">
                 <li className="flex">
                   <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">1</span>
-                  <p className="text-gray-600">Create an order with your requirements and budget</p>
+                  <p className="text-gray-600 dark:text-white">Create an order with your requirements and budget</p>
                 </li>
                 <li className="flex">
                   <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">2</span>
-                  <p className="text-gray-600">Available professionals will be notified of your request</p>
+                  <p className="text-gray-600 dark:text-white">Available professionals will be notified of your request</p>
                 </li>
                 <li className="flex">
                   <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">3</span>
-                  <p className="text-gray-600">Once a professional accepts, you'll be notified</p>
+                  <p className="text-gray-600 dark:text-white">Once a professional accepts, you'll be notified</p>
                 </li>
                 <li className="flex">
                   <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">4</span>
-                  <p className="text-gray-600">The professional will arrive at your location on the scheduled date and time</p>
+                  <p className="text-gray-600 dark:text-white">The professional will arrive at your location on the scheduled date and time</p>
                 </li>
               </ol>
             </div>

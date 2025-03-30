@@ -1,19 +1,19 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 
 /**
  * HistoryFilters component for filtering order history
- * 
+ *
  * @param {Object} props
  * @param {string} props.activeFilter - Currently active filter
  * @param {Function} props.onFilterChange - Function to call when filter changes
  */
-const HistoryFilters = ({ activeFilter, onFilterChange }) => {
+const HistoryFilters = ({activeFilter, onFilterChange}) => {
   const filters = [
-    { id: 'all', label: 'All Orders' },
-    { id: 'pending', label: 'Pending' },
-    { id: 'accepted', label: 'Completed' },
-    { id: 'rejected', label: 'Cancelled' },
+    {id: "all", label: "All Orders"},
+    {id: "pending", label: "Pending"},
+    {id: "accepted", label: "Completed"},
+    {id: "rejected", label: "Cancelled"},
   ];
 
   return (
@@ -22,13 +22,12 @@ const HistoryFilters = ({ activeFilter, onFilterChange }) => {
         <Button
           key={filter.id}
           onClick={() => onFilterChange(filter.id)}
-          variant={activeFilter === filter.id ? "default" : "outline"}
+          variant={activeFilter === filter.id ? "default" : ""}
           className={`whitespace-nowrap ${
-            activeFilter === filter.id 
-              ? "bg-black text-white" 
-              : "bg-white text-black hover:bg-gray-100"
-          }`}
-        >
+            activeFilter === filter.id
+              ? "dark:bg-zinc-900 dark:text-green-300 bg-black text-white"
+              : "dark:bg-zinc-700 dark:text-white bg-white text-black dark:hover:bg-zinc-700 hover:bg-gray-100"
+          }`}>
           {filter.label}
         </Button>
       ))}
@@ -36,4 +35,4 @@ const HistoryFilters = ({ activeFilter, onFilterChange }) => {
   );
 };
 
-export default HistoryFilters; 
+export default HistoryFilters;

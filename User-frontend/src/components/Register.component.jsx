@@ -210,11 +210,11 @@ const RegisterComp = () => {
   ];
 
   return (
-    <div className="w-full min-h-full  flex items-center justify-center bg-gray-50 pb-20 py-10 px-4 sm:px-6 lg:px-8 noScroll">
-      <div className="w-full noScroll">
+    <div className="w-full min-h-full  flex items-center justify-center dark:bg-black dark:text-white bg-gray-50 pb-20 py-10  noScroll">
+      <div className=" h-full noScroll flex flex-col item-center justify-center ">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">Create an account</h2>
-          <p className="mt-2 text-sm text-gray-600">Join Mistri to find the best professionals for your needs</p>
+          <h2 className="text-3xl font-extrabold dark:text-white text-gray-900">Create an account</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-white">Join Mistri to find the best professionals for your needs</p>
         </div>
 
         <form
@@ -234,7 +234,7 @@ const RegisterComp = () => {
               <div key={index}>
                 <label
                   htmlFor={field.name}
-                  className="block text-sm font-medium text-gray-700">
+                  className="block text-sm font-medium text-gray-700 dark:text-white">
                   {field.label}
                 </label>
                 <div className="mt-1 relative">
@@ -244,7 +244,7 @@ const RegisterComp = () => {
                     name={field.name}
                     type={field.type}
                     onChange={handleInput}
-                    className={`appearance-none block w-full pl-10 pr-3 py-3 border ${
+                    className={`appearance-none dark:bg-black block w-full pl-10 pr-3 py-3 border ${
                       fieldErrors[field.name] ? "border-red-500" : "border-gray-300"
                     } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
                     placeholder={field.placeholder}
@@ -255,12 +255,12 @@ const RegisterComp = () => {
             ))}
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <span className="text-gray-600">Already have an account? </span>
+          <div className="w-full flex items-center justify-between">
+            <div className="text-sm flex w-full">
+              <span className="text-gray-600 dark:text-white">Already have an account? </span>
               <Link
                 to="/login"
-                className="font-medium text-black hover:text-gray-800 transition-colors">
+                className="font-medium dark:text-zinc-200 ml-2 text-black hover:text-gray-800 transition-colors">
                 Sign in
               </Link>
             </div>
@@ -269,7 +269,7 @@ const RegisterComp = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black dark:bg-zinc-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create account"}
           </button>
         </form>

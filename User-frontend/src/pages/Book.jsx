@@ -1,10 +1,10 @@
-import React, {useContext, useEffect, useState} from "react";
+"use client";
+
+import {useContext, useEffect, useState} from "react";
 import {useParams, Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import {userContext} from "../context/Auth.context";
 import {Button} from "@/components/ui/button";
-import FormInput from "@/components/ui/FormInput";
-import PageHeader from "@/components/ui/PageHeader";
 import {Calendar, Clock, MapPin, Phone, Mail, Home, IndianRupee, ArrowLeft, CheckCircle, Loader2, Star} from "lucide-react";
 
 const Book = () => {
@@ -29,17 +29,17 @@ const Book = () => {
     setLoading(true);
     axios
       .post(`${backendURL}/user/book/fetch/mistri`, {mistriId})
-      .then(function (response) {
+      .then((response) => {
         if (response && response.data.status === "OK" && response.data.mistri) {
           setMistri(response.data.mistri);
           setCharges(response.data.mistri.charges);
         } else {
-                    navigate("/");
+          navigate("/");
         }
       })
       .catch((error) => {
         console.error("Error fetching mistri details:", error);
-              })
+      })
       .finally(() => {
         setLoading(false);
       });
@@ -49,7 +49,8 @@ const Book = () => {
     e.preventDefault();
 
     if (!time || !date) {
-      return     }
+      return;
+    }
 
     setSubmitting(true);
     const bookingData = {
@@ -62,19 +63,19 @@ const Book = () => {
 
     axios
       .post(`${backendURL}/user/booking/confirm`, bookingData)
-      .then(function (response) {
+      .then((response) => {
         if (response && response.data.status === "OK" && response.data.mistri && response.data.order && response.data.user) {
           setUser((prev) => ({
             ...prev,
             orders: [...prev.orders, response.data.order],
           }));
-                    setTimeout(() => navigate("/bookings"), 2000);
+          setTimeout(() => navigate("/bookings"), 2000);
         } else if (response && response.data.status === "BAD") {
-                  }
+        }
       })
       .catch((error) => {
         console.error("Error confirming booking:", error);
-              })
+      })
       .finally(() => {
         setSubmitting(false);
       });
@@ -98,7 +99,7 @@ const Book = () => {
           <h2 className="text-2xl font-bold mb-4">Login Required</h2>
           <p className="text-gray-600 mb-6">Please login to book a service with this mistri.</p>
           <Link to="/login">
-            <Button className="bg-black hover:bg-gray-800 text-white w-full py-6">Login to Continue</Button>
+            <Button className="bg-black hover:bg-gray-800 dark:hover:bg-zinc-700 text-white w-full py-6">Login to Continue</Button>
           </Link>
         </div>
       </div>
@@ -113,7 +114,7 @@ const Book = () => {
           <h2 className="text-2xl font-bold mb-4">Mistri Not Found</h2>
           <p className="text-gray-600 mb-6">We couldn't find the mistri you're looking for.</p>
           <Link to="/">
-            <Button className="bg-black hover:bg-gray-800 text-white w-full py-6">Back to Home</Button>
+            <Button className="bg-black hover:bg-gray-800 dark:hover:bg-zinc-700 text-white w-full py-6">Back to Home</Button>
           </Link>
         </div>
       </div>
@@ -149,30 +150,29 @@ const Book = () => {
   return (
     <>
       {/* <ToastContainer position="top-center" /> */}
-      <div className="h-full bg-gradient-to-b from-gray-50 to-gray-100  w-full overflow-hidden pb-[70px] my-4">
+      <div className="h-full dark:bg-black dark:text-white bg-gradient-to-b from-gray-50 to-gray-100  w-full overflow-hidden pb-[70px] my-4">
         {/* Header */}
-    
+
         {/* Back Button */}
-        <div className=" pt-3">
+        <div className="dark:bg-black dark:text-white p-3">
           <button
             onClick={() => navigate(-1)}
-            
-            className="ml-4 flex items-center text-gray-600 hover:text-black transition-colors duration-200">
+            className="ml-4 flex items-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors duration-200">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </button>
         </div>
 
-        <div className="w-full  px-4 overflow-y-auto h-full pb-[200px]">
+        <div className="w-full dark:bg-black dark:text-white px-4 overflow-y-auto h-full pb-[200px]">
           {/* Mistri Card */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6 transform transition-all duration-300 hover:shadow-lg ">
+          <div className=" rounded-xl shadow-md overflow-hidden mb-6 transform transition-all duration-300 hover:shadow-lg ">
             <div className="bg-gradient-to-r from-gray-900 to-black text-white p-6">
               <div className="flex items-center">
                 <div className="mr-4 relative">
                   <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-md">
                     <img
                       className="w-full h-full object-cover"
-                      src={mistri.profileImage}
+                      src={mistri.profileImage || "/placeholder.svg"}
                       alt={mistri.mistriname}
                     />
                   </div>
@@ -205,7 +205,6 @@ const Book = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-lg font-semibold">Service Charge</h3>
-         
                 </div>
                 <div className="flex items-center text-green-600 font-bold text-xl">
                   <IndianRupee className="w-5 h-5 mr-1" />
@@ -214,9 +213,9 @@ const Book = () => {
               </div>
             </div>
 
-            <div className="px-6 py-4 bg-gray-50">
+            <div className="px-6 py-4 bg-gray-50 dark:bg-black ">
               <div className="flex items-center justify-between">
-                <div className="flex items-center text-gray-600">
+                <div className="flex items-center dark:text-white text-gray-600">
                   <Clock className="w-4 h-4 mr-2" />
                   <span className="text-sm">Available 7 days a week</span>
                 </div>
@@ -229,10 +228,10 @@ const Book = () => {
           </div>
 
           {/* Booking Form */}
-          <div className="bg-white rounded-xl shadow-md mb-6 transform transition-all duration-300 hover:shadow-lg">
-            <div className="p-6 border-b bg-gradient-to-r from-gray-50 to-white">
+          <div className=" rounded-xl shadow-md mb-6 transform transition-all duration-300 hover:shadow-lg dark:bg-zinc-900 ">
+            <div className="p-6 border-b bg-white dark:bg-zinc-900 dark:text-white">
               <h2 className="text-xl font-bold mb-1">Booking Details</h2>
-              <p className="text-gray-500 text-sm">Select your preferred date and time</p>
+              <p className="text-gray-500 text-sm dark:text-white">Select your preferred date and time</p>
             </div>
 
             <div className="p-6 space-y-6">
@@ -249,7 +248,7 @@ const Book = () => {
                       type="date"
                       name="orderDate"
                       onChange={(e) => setDate(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 dark:bg-black dark:border-zinc-700 dark:text-white dark:focus:ring-zinc-500"
                       min={new Date().toISOString().split("T")[0]}
                       required
                     />
@@ -269,7 +268,7 @@ const Book = () => {
                       type="time"
                       name="orderTime"
                       onChange={(e) => setTime(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 dark:bg-black dark:border-zinc-700 dark:text-white dark:focus:ring-zinc-500"
                       required
                     />
                   </div>
@@ -281,7 +280,7 @@ const Book = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
                     <IndianRupee className="w-4 h-4 mr-2 text-gray-500 group-hover:text-black transition-colors duration-200" />
-                    Service Charge 
+                    Service Charge
                   </div>
                 </label>
                 <div className="relative">
@@ -290,11 +289,10 @@ const Book = () => {
                     name="charges"
                     defaultValue={mistri.charges}
                     onChange={(e) => setCharges(e.target.value)}
-                    className="w-full p-3  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 dark:bg-black dark:border-zinc-700 dark:text-white dark:focus:ring-zinc-500"
                     min={mistri.charges}
                     required
                   />
-                
                 </div>
                 <p className="text-xs text-gray-500 mt-2 flex items-center">
                   <span className="inline-block w-4 h-4 bg-gray-200 rounded-full mr-2 flex items-center justify-center text-xs">i</span>
@@ -305,18 +303,18 @@ const Book = () => {
           </div>
 
           {/* User Information */}
-          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6 transform transition-all duration-300 hover:shadow-lg">
-            <div className="p-6 border-b bg-gradient-to-r from-gray-50 to-white">
-              <h2 className="text-xl font-bold mb-1">Your Information</h2>
-              <p className="text-gray-500 text-sm">This information will be shared with the service provider</p>
+          <div className="dark:bg-zinc-900 dark:text-white rounded-xl shadow-md overflow-hidden mb-6 transform transition-all duration-300 hover:shadow-lg">
+            <div className="p-6 border-b bgwhite dark:bg-zinc-900 dark:text-white">
+              <h2 className="text-xl font-bold mb-1  dark:text-white">Your Information</h2>
+              <p className="text-gray-500 text-sm  dark:text-white">This information will be shared with the service provider</p>
             </div>
 
             <div className="p-6 space-y-4">
               {userFields.map((field, index) => (
                 <div
                   key={index}
-                  className="flex items-center border-b pb-4 last:border-0 last:pb-0 hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
-                  <div className="bg-gray-100 p-3 rounded-full mr-4 text-gray-600">{field.icon}</div>
+                  className="flex items-center border-b pb-4 last:border-0 last:pb-0 hover:bg-gray-50 dark:hover:bg-zinc-800 p-2 rounded-lg transition-colors duration-200">
+                  <div className="bg-gray-100 dark:bg-zinc-800 p-3 rounded-full mr-4 text-gray-600 dark:text-zinc-300">{field.icon}</div>
                   <div>
                     <p className="text-sm text-gray-500">{field.label}</p>
                     <p className="font-medium">{field.value || "Not provided"}</p>
@@ -328,7 +326,7 @@ const Book = () => {
                 <Link to="/profile">
                   <Button
                     variant="outline"
-                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center">
+                    className="w-full border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors duration-200 flex items-center justify-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 mr-2"
@@ -350,20 +348,20 @@ const Book = () => {
           </div>
 
           {/* Booking Button */}
-          <div className="fixed xl:bottom-0 right-0 sm:px-4 xl:w-[80%] sm:w-full sm:bottom-[55px] shadow-lg  z-50  md:px-0">
+          <div className="fixed dark:bg-zinc-900 dark:text-white xl:bottom-0 right-0 sm:px-4 xl:w-[80%] sm:w-full sm:bottom-[55px] shadow-lg  z-50  md:px-0">
             <div className=" ">
-              <div className="bg-white border-t p-4 shadow-lg rounded-t-xl backdrop-blur-md bg-opacity-95">
+              <div className="bg-white dark:bg-zinc-900 dark:text-white border-t p-4 shadow-lg rounded-t-xl backdrop-blur-md bg-opacity-95">
                 {isAlreadyBooked ? (
                   <div className="flex flex-col items-center">
                     <Button
                       disabled
-                      className="w-full bg-gray-800 text-white py-6 flex items-center justify-center opacity-90 rounded-lg">
+                      className="w-full bg-gray-800 dark:bg-zinc-800 text-white py-6 flex items-center justify-center opacity-90 rounded-lg">
                       <CheckCircle className="w-5 h-5 mr-2" />
                       Already Booked
                     </Button>
                     <Link
                       to="/bookings"
-                      className="mt-2 text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                      className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-200">
                       View your bookings
                     </Link>
                   </div>
@@ -376,8 +374,8 @@ const Book = () => {
                         w-full py-6 flex items-center justify-center rounded-lg
                         ${
                           !date || !time
-                            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                            : "bg-black hover:bg-gray-800 text-white transform hover:-translate-y-1 transition-all duration-200"
+                            ? "bg-gray-300 text-gray-600 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-400"
+                            : "bg-black hover:bg-gray-800 dark:hover:bg-zinc-700 text-white transform hover:-translate-y-1 transition-all duration-200"
                         }
                       `}>
                       {submitting ? (
