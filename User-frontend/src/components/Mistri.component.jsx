@@ -2,8 +2,6 @@ import React, {useState, useEffect, useContext} from "react";
 import axios from "axios";
 import Search from "./SearchComp";
 import {Link} from "react-router-dom";
-import {ToastContainer, toast} from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import LoginComp from "../components/Login.component";
 import MistriSkeletonLoading from "../components/Mistri.skeleton.loading";
 import {Input} from "@/components/ui/input";
@@ -34,17 +32,12 @@ const MistriComponent = (props) => {
           } else if (response && response.data.status === "OK" && response.data.type === "remove") {
             setUser((prev) => ({...prev, favourites: prev.favourites.filter((favourite) => favourite !== mistriId)}));
           } else {
-            toast.error("Something went wrong.");
           }
         });
       } else {
-        // toast.dismiss();
-        toast.info("Please login to add a favorite.");
-        sethidden(false);
+        //                 sethidden(false);
       }
-    } catch (err) {
-      toast.error("Something went wrong.");
-    }
+    } catch (err) {}
   };
   const selected = (mistriId) => {
     setSelectedState(true);
@@ -56,7 +49,7 @@ const MistriComponent = (props) => {
   return (
     <div className="noScroll w-full h-full  flex flex-wrap sm:pb-10">
       {console.log(props)}
-      {/* <ToastContainer /> */}
+      {/*  */}
       {props ? (
         props.mistris
           .slice()
@@ -181,7 +174,7 @@ const MistriComponent = (props) => {
       ) : (
         <></>
       )}
-      <div className="xl:hidden sm:block fixed bottom-[70px]  left-0 w-full rounded-lg overflow-hidden">
+      <div className="xl:hidden sm:block fixed Button bottom-[65px]  left-0 w-full rounded-lg overflow-hidden">
         {props.showBookingBtns ? (
           <div className={`${selectedState ? "opacity-100 flex" : "opacity-0 hidden"} w-full  items-center justify-center transition-all`}>
             <Link

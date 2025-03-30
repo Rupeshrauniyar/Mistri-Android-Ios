@@ -1,10 +1,9 @@
 import React, {useState, useEffect, useContext} from "react";
 import axios from "axios";
-import {toast, ToastContainer} from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {userContext} from "@/context/Auth.context";
 import {useNavigate} from "react-router-dom";
 import {Calendar, Clock, IndianRupee, Briefcase, ArrowLeft, Loader2} from "lucide-react";
+import SimplePullToRefresh from "@/components/SimplePullToRefresh";
 
 const Create = () => {
   const backendURL = import.meta.env.VITE_BACKEND_URL;
@@ -57,12 +56,10 @@ const Create = () => {
 
   const createOrder = async () => {
     if (!validateForm()) {
-      toast.error("Please fill all required fields correctly");
       return;
     }
 
     if (!user || !user._id) {
-      toast.error("You must be logged in to create an order");
       return;
     }
 
@@ -74,14 +71,13 @@ const Create = () => {
       });
 
       if (response.data && response.data.order) {
-        toast.success("Order created successfully!");
         navigate("/bookings");
       } else {
-        toast.error("Failed to create order. Please try again.");
+        // Remove toast.error
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      toast.error(error.response?.data?.message || "Failed to create order. Please try again.");
+      // Remove toast.error
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +98,13 @@ const Create = () => {
       }));
     }
   };
-
+  const handleRefresh = async () => {
+    try {
+      setFormData({});
+    } catch (error) {
+      console.error("Refresh failed:", error);
+    }
+  };
   const MistriOptions = [
     "Carpenter",
     "Painter",
@@ -236,188 +238,186 @@ const Create = () => {
   }
 
   return (
-    <div className="w-full h-full bg-gray-50  overflow-y-auto pb-[150px]">
-      <ToastContainer position="top-center" />
-
-      {/* Back Button */}
-      <div className="p-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-gray-600 hover:text-black transition-colors duration-200">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </button>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Create an Order</h1>
-          <p className="text-gray-600 mt-2">Find the best professionals at your preferred price</p>
+    <div className="w-full min-h-full bg-gray-50  overflow-y-auto ">
+      <SimplePullToRefresh onRefresh={handleRefresh}>
+        <div className="p-4 ">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-600 hover:text-black transition-colors duration-200">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </button>
         </div>
+        <div className="max-w-3xl mx-auto px-4 pb-[120px]">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Create an Order</h1>
+            <p className="text-gray-600 mt-2">Find the best professionals at your preferred price</p>
+          </div>
 
-        {/* Form Container */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-          <div className="p-6">
-            {/* Charges Input */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <div className="flex items-center">
-                  <IndianRupee className="w-4 h-4 mr-2 text-gray-500" />
-                  Service Charge (per hour)
-                </div>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500">₹</span>
-                </div>
-                <input
-                  type="number"
-                  placeholder="Enter amount"
-                  value={formData.Charges || ""}
-                  onChange={(e) => handleInputChange("Charges", e.target.value)}
-                  className={`w-full pl-8 pr-3 py-3 border ${
-                    errors.Charges ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
-                />
-              </div>
-              {errors.Charges && <p className="mt-1 text-sm text-red-500">{errors.Charges}</p>}
-            </div>
-
-            {/* Date and Time Inputs */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              {/* Date Input */}
-              <div>
+          {/* Form Container */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <div className="p-6">
+              {/* Charges Input */}
+              <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                    Appointment Date
+                    <IndianRupee className="w-4 h-4 mr-2 text-gray-500" />
+                    Service Charge (per hour)
                   </div>
                 </label>
-                <input
-                  type="date"
-                  value={formData.Date || ""}
-                  onChange={(e) => handleInputChange("Date", e.target.value)}
-                  min={new Date().toISOString().split("T")[0]}
-                  className={`w-full p-3 border ${
-                    errors.Date ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
-                />
-                {errors.Date && <p className="mt-1 text-sm text-red-500">{errors.Date}</p>}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500">₹</span>
+                  </div>
+                  <input
+                    type="number"
+                    placeholder="Enter amount"
+                    value={formData.Charges || ""}
+                    onChange={(e) => handleInputChange("Charges", e.target.value)}
+                    className={`w-full pl-8 pr-3 py-3 border ${
+                      errors.Charges ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
+                  />
+                </div>
+                {errors.Charges && <p className="mt-1 text-sm text-red-500">{errors.Charges}</p>}
               </div>
 
-              {/* Time Input */}
-              <div>
+              {/* Date and Time Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* Date Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                      Appointment Date
+                    </div>
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.Date || ""}
+                    onChange={(e) => handleInputChange("Date", e.target.value)}
+                    min={new Date().toISOString().split("T")[0]}
+                    className={`w-full p-3 border ${
+                      errors.Date ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
+                  />
+                  {errors.Date && <p className="mt-1 text-sm text-red-500">{errors.Date}</p>}
+                </div>
+
+                {/* Time Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-2 text-gray-500" />
+                      Appointment Time
+                    </div>
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.Time || ""}
+                    onChange={(e) => handleInputChange("Time", e.target.value)}
+                    className={`w-full p-3 border ${
+                      errors.Time ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
+                  />
+                  {errors.Time && <p className="mt-1 text-sm text-red-500">{errors.Time}</p>}
+                </div>
+              </div>
+
+              {/* Profession Selection */}
+              <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-gray-500" />
-                    Appointment Time
+                    <Briefcase className="w-4 h-4 mr-2 text-gray-500" />
+                    Select Professional Type
                   </div>
                 </label>
-                <input
-                  type="time"
-                  value={formData.Time || ""}
-                  onChange={(e) => handleInputChange("Time", e.target.value)}
+                <select
+                  value={formData.Profession || ""}
+                  onChange={(e) => handleInputChange("Profession", e.target.value)}
                   className={`w-full p-3 border ${
-                    errors.Time ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
-                />
-                {errors.Time && <p className="mt-1 text-sm text-red-500">{errors.Time}</p>}
+                    errors.Profession ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 appearance-none bg-white`}>
+                  <option value="">Select a profession</option>
+                  {MistriOptions.map((profession, i) => (
+                    <option
+                      key={i}
+                      value={profession}>
+                      {profession}
+                    </option>
+                  ))}
+                </select>
+                {errors.Profession && <p className="mt-1 text-sm text-red-500">{errors.Profession}</p>}
               </div>
-            </div>
 
-            {/* Profession Selection */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <div className="flex items-center">
-                  <Briefcase className="w-4 h-4 mr-2 text-gray-500" />
-                  Select Professional Type
+              {/* Popular Professions */}
+              <div className="mb-6">
+                <p className="text-sm font-medium text-gray-700 mb-2">Popular Choices:</p>
+                <div className="flex flex-wrap gap-2">
+                  {popularProfessions.map((profession, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleInputChange("Profession", profession)}
+                      className={`px-3 py-2 text-sm rounded-full ${
+                        formData.Profession === profession ? "bg-black text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      } transition-colors duration-200`}>
+                      {profession}
+                    </button>
+                  ))}
                 </div>
-              </label>
-              <select
-                value={formData.Profession || ""}
-                onChange={(e) => handleInputChange("Profession", e.target.value)}
-                className={`w-full p-3 border ${
-                  errors.Profession ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200 appearance-none bg-white`}>
-                <option value="">Select a profession</option>
-                {MistriOptions.map((profession, i) => (
-                  <option
-                    key={i}
-                    value={profession}>
-                    {profession}
-                  </option>
-                ))}
-              </select>
-              {errors.Profession && <p className="mt-1 text-sm text-red-500">{errors.Profession}</p>}
-            </div>
-
-            {/* Popular Professions */}
-            <div className="mb-6">
-              <p className="text-sm font-medium text-gray-700 mb-2">Popular Choices:</p>
-              <div className="flex flex-wrap gap-2">
-                {popularProfessions.map((profession, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => handleInputChange("Profession", profession)}
-                    className={`px-3 py-2 text-sm rounded-full ${
-                      formData.Profession === profession ? "bg-black text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    } transition-colors duration-200`}>
-                    {profession}
-                  </button>
-                ))}
               </div>
             </div>
+
+            {/* Submit Button */}
+            <div className="px-6 py-4 bg-gray-50 border-t">
+              <button
+                onClick={createOrder}
+                disabled={isSubmitting}
+                className={`w-full py-3 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                  isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800 transform hover:-translate-y-1"
+                } text-white font-medium`}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Creating Order...
+                  </>
+                ) : (
+                  "Create Order"
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="px-6 py-4 bg-gray-50 border-t">
-            <button
-              onClick={createOrder}
-              disabled={isSubmitting}
-              className={`w-full py-3 rounded-lg flex items-center justify-center transition-all duration-200 ${
-                isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800 transform hover:-translate-y-1"
-              } text-white font-medium`}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Creating Order...
-                </>
-              ) : (
-                "Create Order"
-              )}
-            </button>
+          {/* Information Card */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <div className="p-6 border-b">
+              <h2 className="text-lg font-semibold">How it works</h2>
+            </div>
+            <div className="p-6">
+              <ol className="space-y-4">
+                <li className="flex">
+                  <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">1</span>
+                  <p className="text-gray-600">Create an order with your requirements and budget</p>
+                </li>
+                <li className="flex">
+                  <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">2</span>
+                  <p className="text-gray-600">Available professionals will be notified of your request</p>
+                </li>
+                <li className="flex">
+                  <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">3</span>
+                  <p className="text-gray-600">Once a professional accepts, you'll be notified</p>
+                </li>
+                <li className="flex">
+                  <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">4</span>
+                  <p className="text-gray-600">The professional will arrive at your location on the scheduled date and time</p>
+                </li>
+              </ol>
+            </div>
           </div>
         </div>
-
-        {/* Information Card */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-          <div className="p-6 border-b">
-            <h2 className="text-lg font-semibold">How it works</h2>
-          </div>
-          <div className="p-6">
-            <ol className="space-y-4">
-              <li className="flex">
-                <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">1</span>
-                <p className="text-gray-600">Create an order with your requirements and budget</p>
-              </li>
-              <li className="flex">
-                <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">2</span>
-                <p className="text-gray-600">Available professionals will be notified of your request</p>
-              </li>
-              <li className="flex">
-                <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">3</span>
-                <p className="text-gray-600">Once a professional accepts, you'll be notified</p>
-              </li>
-              <li className="flex">
-                <span className="bg-black text-white w-6 h-6 rounded-full flex items-center justify-center mr-3 flex-shrink-0">4</span>
-                <p className="text-gray-600">The professional will arrive at your location on the scheduled date and time</p>
-              </li>
-            </ol>
-          </div>
-        </div>
-      </div>
+      </SimplePullToRefresh>
     </div>
   );
 };

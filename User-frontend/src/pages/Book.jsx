@@ -1,7 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
 import {useParams, Link, useNavigate} from "react-router-dom";
-import {ToastContainer, toast} from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import {userContext} from "../context/Auth.context";
 import {Button} from "@/components/ui/button";
@@ -36,14 +34,12 @@ const Book = () => {
           setMistri(response.data.mistri);
           setCharges(response.data.mistri.charges);
         } else {
-          toast.error("No mistri found.");
-          navigate("/");
+                    navigate("/");
         }
       })
       .catch((error) => {
         console.error("Error fetching mistri details:", error);
-        toast.error("Failed to load mistri details. Please try again.");
-      })
+              })
       .finally(() => {
         setLoading(false);
       });
@@ -53,8 +49,7 @@ const Book = () => {
     e.preventDefault();
 
     if (!time || !date) {
-      return toast.error("Please select both date and time for your appointment.");
-    }
+      return     }
 
     setSubmitting(true);
     const bookingData = {
@@ -73,16 +68,13 @@ const Book = () => {
             ...prev,
             orders: [...prev.orders, response.data.order],
           }));
-          toast.success("Booking confirmed successfully!");
-          setTimeout(() => navigate("/bookings"), 2000);
+                    setTimeout(() => navigate("/bookings"), 2000);
         } else if (response && response.data.status === "BAD") {
-          toast.error(response.data.message);
-        }
+                  }
       })
       .catch((error) => {
         console.error("Error confirming booking:", error);
-        toast.error("Failed to confirm booking. Please try again.");
-      })
+              })
       .finally(() => {
         setSubmitting(false);
       });

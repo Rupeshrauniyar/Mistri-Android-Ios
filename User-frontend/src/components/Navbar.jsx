@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, History, PlusCircle, Book, User } from "lucide-react";
+import { Home, History, PlusCircle, Book, User, LogOut, Settings } from "lucide-react";
+import { userContext } from "../context/Auth.context";
 
 const Navbar = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("/");
+  const { user } = useContext(userContext);
   
   useEffect(() => {
     setActiveTab(location.pathname);
@@ -58,6 +60,26 @@ const Navbar = () => {
               <span className="font-medium">{navLink.name}</span>
             </NavLink>
           ))}
+          
+          {/* Divider */}
+          <div className="border-t border-gray-200 my-4"></div>
+          
+          {/* Settings Link */}
+          <NavLink
+            to="/settings"
+            className={({ isActive }) => `
+              flex items-center px-4 py-3 my-1 rounded-xl transition-all duration-200
+              ${isActive 
+                ? 'bg-black text-white' 
+                : 'text-gray-700 hover:bg-gray-100'}
+            `}
+          >
+            <Settings className="w-5 h-5 mr-3" />
+            <span className="font-medium">Settings</span>
+          </NavLink>
+          
+          {/* Logout Link */}
+          
         </div>
       </div>
 

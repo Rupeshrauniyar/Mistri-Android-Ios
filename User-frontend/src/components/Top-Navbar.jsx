@@ -19,21 +19,26 @@ const TopNavbar = () => {
                     {user?.username?.charAt(0).toUpperCase()}
                   </div>
                 ) : (
-                  <div className="w-10 h-10 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center shadow-md">
-                    <User className="w-5 h-5" />
-                  </div>
+                  <></>
                 )}
-                <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                {user ? (
+                  <>
+                    <span className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                  </>
+                ) : (
+                  <></>
+                )}
               </div>
 
               <div className="flex flex-col">
                 {user ? (
                   <>
                     <p className="font-medium text-gray-800">{user.username}</p>
-                   
                   </>
                 ) : (
-                  <p className="font-medium text-red-500">Guest</p>
+                  <Link to="/login">
+                    <button className="font-medium text-white-500 bg-black text-white px-4 py-2 rounded-full">Login</button>
+                  </Link>
                 )}
               </div>
             </div>
@@ -52,6 +57,8 @@ const TopNavbar = () => {
                 <Bell className="w-5 h-5 text-gray-700" />
                 {user && <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>}
               </Link>
+
+             
 
               <Link
                 to={"/settings"}

@@ -1,3 +1,6 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 /* Load custom font */
 @font-face {
     font-family: 'CustomBlack';
@@ -6,100 +9,144 @@
     font-style: normal;
 }
 
-
 * {
-    font-family: 'CustomBlack', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+    -webkit-tap-highlight-color: transparent;
 }
 
+.font-display {
+    font-family: 'CustomBlack', sans-serif;
+}
 
+/* Active navigation state */
 a.active {
-
-    background-color: black;
-    color: #fff;
+    @apply bg-primary text-white;
+    position: relative;
 }
 
-.noScroll {
-    /* For most browsers */
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE and Edge */
+a.active::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    @apply bg-accent rounded-l-full;
+}
 
-    /* For WebKit-based browsers (Chrome, Safari, etc.) */
+/* Scrollbar styling */
+.noScroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    
     &::-webkit-scrollbar {
         display: none;
     }
 }
 
-.blur {
-    backdrop-filter: blur(2px);
+/* Custom scrollbar for other elements */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
 
+.custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-700;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-600;
+}
+
+/* Backdrop blur utility */
+.blur-backdrop {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Animation utilities */
+.animate-enter {
+    animation: enter 0.2s ease-out;
+}
+
+.animate-leave {
+    animation: leave 0.15s ease-in forwards;
+}
+
+@keyframes enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes leave {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@layer base {
-  :root {
-        --background: 0 0% 100%;
-        --foreground: 222.2 84% 4.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 222.2 84% 4.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 222.2 84% 4.9%;
-        --primary: 222.2 47.4% 11.2%;
-        --primary-foreground: 210 40% 98%;
-        --secondary: 210 40% 96.1%;
-        --secondary-foreground: 222.2 47.4% 11.2%;
-        --muted: 210 40% 96.1%;
-        --muted-foreground: 215.4 16.3% 46.9%;
-        --accent: 210 40% 96.1%;
-        --accent-foreground: 222.2 47.4% 11.2%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 214.3 31.8% 91.4%;
-        --input: 214.3 31.8% 91.4%;
-        --ring: 222.2 84% 4.9%;
-        --chart-1: 12 76% 61%;
-        --chart-2: 173 58% 39%;
-        --chart-3: 197 37% 24%;
-        --chart-4: 43 74% 66%;
-        --chart-5: 27 87% 67%;
-        --radius: 0.5rem;
+
+/* Component layer utilities */
+@layer components {
+    .btn-primary {
+        @apply bg-primary hover:bg-primary-600 text-white font-medium py-2 px-4 rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-300 active:scale-95;
     }
-  .dark {
-        --background: 222.2 84% 4.9%;
-        --foreground: 210 40% 98%;
-        --card: 222.2 84% 4.9%;
-        --card-foreground: 210 40% 98%;
-        --popover: 222.2 84% 4.9%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 210 40% 98%;
-        --primary-foreground: 222.2 47.4% 11.2%;
-        --secondary: 217.2 32.6% 17.5%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 217.2 32.6% 17.5%;
-        --muted-foreground: 215 20.2% 65.1%;
-        --accent: 217.2 32.6% 17.5%;
-        --accent-foreground: 210 40% 98%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 217.2 32.6% 17.5%;
-        --input: 217.2 32.6% 17.5%;
-        --ring: 212.7 26.8% 83.9%;
-        --chart-1: 220 70% 50%;
-        --chart-2: 160 60% 45%;
-        --chart-3: 30 80% 55%;
-        --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%;
+    
+    .btn-secondary {
+        @apply bg-secondary hover:bg-secondary-600 text-white font-medium py-2 px-4 rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary-300 active:scale-95;
+    }
+    
+    .btn-outline {
+        @apply border border-gray-300 hover:border-gray-400 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium py-2 px-4 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95;
+    }
+    
+    .input-primary {
+        @apply px-4 py-2 border border-gray-300 dark:border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary-100 dark:focus:ring-primary-900 rounded-lg outline-none transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600;
+    }
+    
+    .card {
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700;
+    }
+    
+    .card-hover {
+        @apply transition-all hover:-translate-y-1 hover:shadow-lg;
     }
 }
-@layer base {
-  * {
-    @apply border-border;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
+
+/* Default body styles */
+body {
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
 }

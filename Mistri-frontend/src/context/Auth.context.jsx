@@ -23,3 +23,4 @@ export const AuthProvider = ({children}) => {
 
   return <mistriContext.Provider value={{mistri, setMistri, mistriLoading, setMistriLoading}}> {children} </mistriContext.Provider>;
 };
+

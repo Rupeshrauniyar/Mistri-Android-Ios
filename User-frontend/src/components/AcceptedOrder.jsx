@@ -1,7 +1,5 @@
 import React, {useEffect, useState, useContext, useRef} from "react";
 import axios from "axios";
-import {toast} from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {userContext} from "../context/Auth.context";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
@@ -33,69 +31,68 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   const [positionLoading, setPositionLoading] = useState(true);
   const [mistriPositionLoading, setMistriPositionLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const permissionRequested = useRef(false); // Track if permission request has been made
-  const errorDisplayed = useRef(false); // Track if error has already been displayed
+  const [permissionStatus, setPermissionStatus] = useState(null);
+  const watchIdRef = useRef(null);
   const {activeOrders, seActiveOrdersContext} = useContext(ActiveOrdersContext);
 
-  // const getPermissionAndWatchPositionForMobile = async () => {
-  //   try {
-  //     if (permissionRequested.current) return; // Exit if already requested
-  //     permissionRequested.current = true;
-
-  //     const hasPermission = await Geolocation.requestPermissions();
-  //     if (hasPermission.location === "granted") {
-  //       const watchId = Geolocation.watchPosition({enableHighAccuracy: true, timeout: 5000, maximumAge: 0}, (position, err) => {
-  //         if (err) {
-  //           if (!errorDisplayed.current) {
-  //             // Show error only once
-  //             setError("Error fetching geolocation");
-  //             toast.error("Error fetching geolocation");
-  //             errorDisplayed.current = true;
-  //           }
-  //           setPositionLoading(false);
-  //           return;
-  //         }
-  //         const {latitude, longitude} = position.coords;
-  //         setUserPosition([latitude, longitude]);
-  //         setPositionLoading(false);
-  //       });
-
-  //       // Cleanup function to clear watch when component unmounts
-  //       return () => Geolocation.clearWatch({id: watchId});
-  //     } else {
-  //       if (!errorDisplayed.current) {
-  //         // Show error only once
-  //         // setError("Location permission denied.");
-  //         toast.error("Location permission denied.");
-  //         errorDisplayed.current = true;
-  //       }
-  //       setPositionLoading(false);
-  //     }
-  //   } catch (err) {
-  //     // toast.error("Failed to request location permissions.");
-  //     if (!errorDisplayed.current) {
-  //       // Show error only once
-  //       // setError("Failed to request location permissions.");
-  //       errorDisplayed.current = true;
-  //     }
-  //     setPositionLoading(false);
-  //     return;
-  //   }
-  // };
+  // Function for mobile devices using Capacitor
 
 
 
-  
-  const getPermissionAndWatchPositionForWeb = () => {
-    if (permissionRequested.current) return; // Exit if permission already requested
-    permissionRequested.current = true;
+  const getMobileLocation = async () => {
+    try {
+      // Check permissions first
+      const permission = await Geolocation.checkPermissions();
+      setPermissionStatus(permission.location);
 
-    if (!navigator.geolocation) {
-      if (!errorDisplayed.current) {
-        toast.error("Geolocation is not supported by your browser.");
-        errorDisplayed.current = true;
+      if (permission.location !== "granted") {
+        const requestPermission = await Geolocation.requestPermissions();
+        if (requestPermission.location !== "granted") {
+          setError("Location permission denied");
+            //         setPositionLoading(false);
+          return;
+        }
       }
+
+      // Start watching position
+      const watchId = await Geolocation.watchPosition(
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        },
+        (position, err) => {
+          if (err) {
+            setError("Error fetching geolocation");
+              //           setPositionLoading(false);
+            return;
+          }
+          const {latitude, longitude} = position.coords;
+          setUserPosition([latitude, longitude]);
+          setPositionLoading(false);
+          setError(null);
+        }
+      );
+
+      watchIdRef.current = watchId;
+
+      return () => {
+        if (watchIdRef.current) {
+          Geolocation.clearWatch({id: watchIdRef.current});
+        }
+      };
+    } catch (err) {
+      console.error("Error in mobile location:", err);
+      setError("Failed to access location services");
+        //     setPositionLoading(false);
+      alert(err)
+    }
+  };
+
+  // Function for web browsers using native geolocation
+  const getWebLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
       setPositionLoading(false);
       return;
     }
@@ -106,36 +103,63 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
           const {latitude, longitude} = position.coords;
           setUserPosition([latitude, longitude]);
           setPositionLoading(false);
+          setError(null);
         },
         (err) => {
-          if (!errorDisplayed.current) {
-            // Show error only once
-            toast.error("Error fetching geolocation.");
-            errorDisplayed.current = true;
+          // console.error("Geolocation Error:", err);
+          let errorMessage = "Error accessing location";
+
+          switch (err.code) {
+            case 1:
+              errorMessage = "Location access denied. Please enable location services.";
+              break;
+            case 2:
+              errorMessage = "Location unavailable. Please try again.";
+              break;
+            case 3:
+              errorMessage = "Location request timed out. Please try again.";
+              break;
           }
+
+          setError(errorMessage);
           setPositionLoading(false);
-          console.error("Geolocation Error:", err.message);
         },
-        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        }
       );
 
-      // Cleanup function to clear the watch
-      return () => navigator.geolocation.clearWatch(watchId);
+      watchIdRef.current = watchId;
+
+      return () => {
+        if (watchIdRef.current) {
+          navigator.geolocation.clearWatch(watchIdRef.current);
+        }
+      };
     } catch (err) {
-      if (!errorDisplayed.current) {
-        // Show error only once
-        toast.error("Failed to access geolocation.");
-        errorDisplayed.current = true;
-      }
+      console.error("Error in web location:", err);
+      setError("Failed to access location services");
       setPositionLoading(false);
-      console.error("Geolocation Error:", err.message);
     }
   };
+
+  // Initialize location tracking
   useEffect(() => {
-    // getPermissionAndWatchPositionForMobile();
-    getPermissionAndWatchPositionForWeb();
+    // getWebLocation();
+    getMobileLocation();
   }, []);
 
+  // Handle retry location access
+  const handleRetryLocation = async () => {
+    setPositionLoading(true);
+    setError(null);
+    getWebLocation();
+    // getMobileLocation();
+  };
+
+  // Socket connection effect
   useEffect(() => {
     if (!error && userPosition[0] !== 0 && userPosition[1] !== 0) {
       socket.emit("joinRoom", {room: order._id, userId: order.user._id});
@@ -145,6 +169,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       });
 
       socket.on("receive-location", (Data) => {
+        console.log("Data", Data);
         if (Data.mistriPosition && (Data.mistriPosition[0] !== mistriPosition[0] || Data.mistriPosition[1] !== mistriPosition[1])) {
           setMistriPosition(Data.mistriPosition);
           setMistriPositionLoading(false);
@@ -161,25 +186,15 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   const userMarker = new L.Icon({
     iconUrl:
       "https://imgs.search.brave.com/ApJIYKDK7IGJuNPMwxqzH5HiB2K7pM7QJC2EpHmkqoU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wbHVz/cG5nLmNvbS9pbWct/cG5nL3BuZy1sb2Nh/dGlvbi1maWxlLWxv/Y2F0aW9uLWljb24t/cG5nLTI4Ny5wbmc",
-    iconSize: [25, 40],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
+    iconSize: [20, 30],
+  
   });
   const mistriMarker = new L.Icon({
     iconUrl: "https://pluspng.com/img-png/png-location-location-black-png-image-4231-1200.png",
     iconSize: [35, 40],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
+
   });
   const polylinePoints = [userPosition, mistriPosition];
-  if (positionLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-64px)] space-y-4">
-        <Loader2 className="w-10 h-10 text-black animate-spin" />
-        <p className="text-gray-600">Getting your location...</p>
-      </div>
-    );
-  }
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
@@ -195,12 +210,28 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   };
 
   const renderMap = () => {
-    if (!userPosition[0] || !userPosition[1]) {
+    if (positionLoading) {
       return (
-        <div className="flex items-center justify-center h-full bg-gray-50">
-          <div className="text-center">
-            <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-600">Location not available</p>
+        <div className="flex flex-col items-center justify-center h-full space-y-4">
+          <Loader2 className="w-10 h-10 text-black animate-spin" />
+          <p className="text-gray-600">Getting your location...</p>
+        </div>
+      );
+    }
+    if (error || !userPosition ) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full bg-gray-50 space-y-4 rounded-t-2xl">
+          <MapPin className="w-12 h-12 text-gray-400" />
+          <div className="text-center px-4">
+            <p className="text-gray-600 mb-4">
+              {error === "Location permission denied" ? "Please enable location access to track the service professional" : "Unable to access your location"}
+            </p>
+            <Button
+              onClick={handleRetryLocation}
+              className="bg-black hover:bg-gray-800 text-white flex items-center space-x-2">
+              <RefreshCcw className="w-4 h-4" />
+              <span>Enable Location Access</span>
+            </Button>
           </div>
         </div>
       );
@@ -209,9 +240,9 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
     return (
       <MapContainer
         center={userPosition}
-        zoom={15}
-        className="w-full h-full">
-        <MapUpdater center={userPosition} />
+        zoom={16}
+        className="w-full h-full z-20 rounded-t-2xl">
+        
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -241,86 +272,76 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   };
 
   return (
-    <div className="w-full bg-white">
-      {/* Map Section */}
-      <div className="w-full h-[40vh] sm:h-[50vh] relative">{renderMap()}</div>
+    <div className="w-full mt-4 overflow-hidden px-4 pb-[150px]">
+      <div className="w-full bg-white rounded-2xl overflow-hidden shadow-md">
+        {/* Map Section */}
+        <div className="w-full h-[40vh] sm:h-[50vh] relative overflow-hidden">{renderMap()}</div>
 
-      {/* Professional Info Card */}
-      <div className="p-4 border-b">
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-gray-500" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-xl font-bold text-gray-900">{order.mistri.mistriname}</h2>
-            <p className="text-gray-600">{order.mistri.profession}</p>
-          </div>
-          <div className="text-right">
-            <div className="inline-flex items-center px-3 py-1 bg-black text-white text-sm">
-              <IndianRupee className="w-4 h-4 mr-1" />
-              {order.charges}/hr
+        {/* Professional Info Card */}
+        <div className="p-4 border-b">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+              <User className="w-8 h-8 text-gray-500" />
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Order Details */}
-      <div className="p-4 space-y-4">
-        {/* Status */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">Order Status</span>
-          <span className={`px-3 py-1 text-sm font-medium ${getStatusColor(order.status)}`}>{order.status}</span>
-        </div>
-
-        {/* Time and Location */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4">
-          <div className="space-y-3">
-            <div className="flex items-center text-gray-600">
-              <Calendar className="w-4 h-4 mr-2 shrink-0" />
-              <span className="text-sm">{order.orderDate}</span>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-gray-900">{order.mistri.mistriname}</h2>
+              <p className="text-gray-600">{order.mistri.profession}</p>
             </div>
-            <div className="flex items-center text-gray-600">
-              <Clock className="w-4 h-4 mr-2 shrink-0" />
-              <span className="text-sm">{order.orderTime}</span>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center text-gray-600">
-              <MapPin className="w-4 h-4 mr-2 shrink-0" />
-              <span className="text-sm truncate">{order.mistri.address}</span>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <Phone className="w-4 h-4 mr-2 shrink-0" />
-              <span className="text-sm">{order.mistri.contactNumber}</span>
+            <div className="text-right">
+              <div className="inline-flex items-center px-3 py-1 bg-black text-white text-sm rounded-full">
+                <IndianRupee className="w-4 h-4 mr-1" />
+                {order.charges}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* OTP Section */}
-        <div className="bg-gray-50 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-gray-700">Service OTP</label>
-            <CheckCircle className="w-5 h-5 text-green-500" />
+        {/* Order Details */}
+        <div className="p-4 space-y-4">
+          {/* Status */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">Order Status</span>
+            <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}>{order.status}</span>
           </div>
-          <Input
-            disabled
-            className="text-center font-mono text-2xl tracking-wider bg-white border-0"
-            value={order.otp}
-          />
-          <p className="text-xs text-gray-500 text-center mt-2">Share this OTP with the professional when they arrive</p>
-        </div>
 
-        {/* Navigation Button */}
-        <Button
-          className="w-full bg-black hover:bg-gray-800 text-white flex items-center justify-center space-x-2 py-6"
-          onClick={() => {
-            const url = `https://www.google.com/maps/dir/?api=1&destination=${mistriPosition[0]},${mistriPosition[1]}`;
-            window.open(url, "_blank");
-          }}
-          disabled={!mistriPosition[0] || !mistriPosition[1]}>
-          <Navigation className="w-5 h-5" />
-          <span>Navigate to Professional</span>
-        </Button>
+          {/* Time and Location */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4">
+            <div className="space-y-3">
+              <div className="flex items-center text-gray-600">
+                <Calendar className="w-4 h-4 mr-2 shrink-0" />
+                <span className="text-sm">{order.orderDate}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Clock className="w-4 h-4 mr-2 shrink-0" />
+                <span className="text-sm">{order.orderTime}</span>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center text-gray-600">
+                <MapPin className="w-4 h-4 mr-2 shrink-0" />
+                <span className="text-sm truncate">{order.mistri.address}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <Phone className="w-4 h-4 mr-2 shrink-0" />
+                <span className="text-sm">{order.mistri.contactNumber}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* OTP Section */}
+          <div className="bg-gray-50 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-gray-700">Service OTP</label>
+              <CheckCircle className="w-5 h-5 text-green-500" />
+            </div>
+            <Input
+              disabled
+              className="text-center font-mono text-2xl tracking-wider bg-white border-0 text-green-800"
+              value={order.otp}
+            />
+            <p className="text-xs text-gray-500 text-center mt-2">Share this OTP with the professional when they arrive</p>
+          </div>
+        </div>
       </div>
     </div>
   );

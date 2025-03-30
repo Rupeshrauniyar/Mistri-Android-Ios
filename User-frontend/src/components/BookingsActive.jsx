@@ -26,7 +26,6 @@ const ActiveOrdersComp = ({order}) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4  transition-all  hover:ring-2 ring-black cursor-pointer">
-      
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center space-x-3">
           <img
@@ -45,7 +44,7 @@ const ActiveOrdersComp = ({order}) => {
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <p className="text-sm text-gray-500">Date</p>
-          <p className="font-medium">{new Date(order.orderDate).toLocaleDateString()}</p>
+          <p className="font-medium">{(order.orderDate)}</p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Time</p>
@@ -63,7 +62,7 @@ const ActiveOrdersComp = ({order}) => {
 
       <div className="flex justify-between items-center text-sm text-gray-500 pt-3 border-t">
         <p>Order ID: {order._id.slice(-8)}...</p>
-        <p>{formatDate(order.createdAt)}</p>
+        <p>Created {formatDate(order.createdAt)}</p>
       </div>
     </div>
   );

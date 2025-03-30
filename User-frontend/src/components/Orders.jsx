@@ -67,7 +67,7 @@ const Orders = ({order}) => {
 
       <div className="flex justify-between items-center text-sm text-gray-500 pt-3 border-t">
         <p>Order ID: {order._id.slice(-8)}...</p>
-        <p>{formatDate(order.createdAt)}</p>
+        <p>Created at: {formatDate(order.createdAt)}</p>
       </div>
     </div>
   );

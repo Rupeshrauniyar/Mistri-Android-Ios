@@ -1,48 +1,94 @@
-import React, {useState, useContext} from "react";
+import React, {useState, useContext, useRef, useEffect} from "react";
 import axios from "axios";
-import {ToastContainer, toast} from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {Link, useNavigate, useLocation} from "react-router-dom";
 import {userContext} from "../context/Auth.context";
-import { Loader2 } from "lucide-react";
+import {Loader2} from "lucide-react";
 
 const LoginComp = (props) => {
   const navigate = useNavigate();
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const {user, setUser, setUserLoading} = useContext(userContext);
+  const {user, setUser, login} = useContext(userContext);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const isMounted = useRef(true);
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    password: "",
+  });
   const [inpValue, setInpValue] = useState({
     email: "",
     password: "",
   });
   const {state} = useLocation();
 
+  // Clean up when component unmounts
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  const validateForm = () => {
+    let isValid = true;
+    const newFieldErrors = {
+      email: "",
+      password: "",
+    };
+
+    // Email validation
+    if (!inpValue.email) {
+      newFieldErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(inpValue.email)) {
+      newFieldErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!inpValue.password) {
+      newFieldErrors.password = "Password is required";
+      isValid = false;
+    }
+
+    setFieldErrors(newFieldErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post(`${backendUrl}/auth/user/login`, inpValue);
+
       if (response.data.status === "BAD") {
-        toast.error(response.data.message);
+        setErrorMessage("Login failed. Please check your credentials.");
+        setLoading(false);
       } else if (response.data.status === "OK") {
-        toast.success(response.data.message);
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        setUser(response.data.user);
-        if (props.doRedirect === true) {
-          setTimeout(() => {
-            if (state) {
-              navigate(state);
-            } else {
-              navigate("/");
-            }
-          }, 500);
-        }
+        // Set redirecting state to prevent multiple clicks
+        setIsRedirecting(true);
+
+        // Use the login function from context which ensures proper state update
+        await login(response.data.user, response.data.token);
+
+        // Add a slight delay before navigation to ensure context is updated
+        setTimeout(() => {
+          navigate("/", {replace: true});
+        }, 300);
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
+      setErrorMessage(error.response?.data?.message || "An error occurred. Please try again.");
+      setIsRedirecting(false);
     } finally {
-      setLoading(false);
+      if (isMounted.current && !isRedirecting) {
+        setLoading(false);
+      }
     }
   };
 
@@ -52,6 +98,14 @@ const LoginComp = (props) => {
       ...prev,
       [name]: value,
     }));
+
+    // Clear field error when user types
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
   const requiredFields = [
@@ -97,36 +151,47 @@ const LoginComp = (props) => {
   }
 
   return (
-    <div className="w-full    flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="w-full h-full">
+    <div className="w-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="w-full h-full max-w-md">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account to continue
-          </p>
+          <p className="mt-2 text-sm text-gray-600">Sign in to your account to continue</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 space-y-6"
+          noValidate>
+          {errorMessage && (
+            <div
+              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
+              role="alert">
+              <p>{errorMessage}</p>
+            </div>
+          )}
+
           <div className="space-y-4">
             {requiredFields.map((field, index) => (
               <div key={index}>
-                <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor={field.name}
+                  className="block text-sm font-medium text-gray-700">
                   {field.label}
                 </label>
                 <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    {field.svg}
-                  </div>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">{field.svg}</div>
                   <input
                     id={field.name}
                     name={field.name}
                     type={field.type}
-                    required
                     onChange={handleInput}
-                    className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200"
+                    className={`appearance-none block w-full pl-10 pr-3 py-3 border ${
+                      fieldErrors[field.name] ? "border-red-500" : "border-gray-300"
+                    } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
                     placeholder={field.placeholder}
                   />
                 </div>
+                {fieldErrors[field.name] && <p className="mt-1 text-sm text-red-600">{fieldErrors[field.name]}</p>}
               </div>
             ))}
           </div>
@@ -134,12 +199,16 @@ const LoginComp = (props) => {
           <div className="flex items-center justify-between">
             <div className="text-sm">
               <span className="text-gray-600">Create an account? </span>
-              <Link to="/register" className="font-medium text-black hover:text-gray-800 transition-colors">
+              <Link
+                to="/register"
+                className="font-medium text-black hover:text-gray-800 transition-colors">
                 Sign up
               </Link>
             </div>
             <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-black hover:text-gray-800 transition-colors">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-black hover:text-gray-800 transition-colors">
                 Forgot password?
               </Link>
             </div>
@@ -147,11 +216,13 @@ const LoginComp = (props) => {
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+            disabled={loading || isRedirecting}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            {loading || isRedirecting ? (
+              <div className="flex items-center">
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                {isRedirecting ? "Redirecting..." : "Signing in..."}
+              </div>
             ) : (
               "Sign in"
             )}

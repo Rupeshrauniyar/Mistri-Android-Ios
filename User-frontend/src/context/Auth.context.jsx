@@ -1,6 +1,5 @@
 import React, { useState, useEffect, createContext } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
 
 export const userContext = createContext();
 
@@ -84,8 +83,7 @@ export const AuthProvider = ({ children }) => {
       if (localUser && token) {
         setUser(localUser);
         if (!isOffline) {
-          toast.warning("Using offline data. Some features may be limited.");
-        }
+                  }
       } else {
         setUser(null);
       }

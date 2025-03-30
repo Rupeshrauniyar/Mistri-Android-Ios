@@ -1,7 +1,5 @@
 import React, {useState, useContext} from "react";
 import axios from "axios";
-import {ToastContainer, toast} from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {Link, useNavigate} from "react-router-dom";
 // import mistri from "../user-pages/Mistri.jpg";
 import {userContext} from "../context/Auth.context";
@@ -9,9 +7,17 @@ import {Loader2} from "lucide-react";
 
 const RegisterComp = () => {
   const navigate = useNavigate();
-  const {user, setUser, setUserLoading} = useContext(userContext);
+  const {user, setUser, setUserLoading, CheckUser} = useContext(userContext);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    password: "",
+    username: "",
+    address: "",
+    contactNumber: "",
+  });
   const [inpValue, setInpValue] = useState({
     email: "",
     password: "",
@@ -20,23 +26,85 @@ const RegisterComp = () => {
     contactNumber: "",
   });
 
+  const validateForm = () => {
+    let isValid = true;
+    const newFieldErrors = {
+      email: "",
+      password: "",
+      username: "",
+      address: "",
+      contactNumber: "",
+    };
+
+    // Username validation
+    if (!inpValue.username) {
+      newFieldErrors.username = "Username is required";
+      isValid = false;
+    } else if (inpValue.username.length < 3) {
+      newFieldErrors.username = "Username must be at least 3 characters";
+      isValid = false;
+    }
+
+    // Email validation
+    if (!inpValue.email) {
+      newFieldErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(inpValue.email)) {
+      newFieldErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!inpValue.password) {
+      newFieldErrors.password = "Password is required";
+      isValid = false;
+    } else if (inpValue.password.length < 6) {
+      newFieldErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    // Contact number validation
+    if (!inpValue.contactNumber) {
+      newFieldErrors.contactNumber = "Contact number is required";
+      isValid = false;
+    } else if (!/^\d{10}$/.test(inpValue.contactNumber)) {
+      newFieldErrors.contactNumber = "Please enter a valid 10-digit contact number";
+      isValid = false;
+    }
+
+    // Address validation
+    if (!inpValue.address) {
+      newFieldErrors.address = "Address is required";
+      isValid = false;
+    }
+
+    setFieldErrors(newFieldErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post(`${backendUrl}/auth/user/register`, inpValue);
       if (response.data.status === "BAD") {
-        toast.error(response.data.message);
+        setErrorMessage(response.data.message || "Registration failed. Please try again.");
       } else if (response.data.status === "OK") {
         setUser(response.data.user);
-        toast.success(response.data.message);
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
+        await CheckUser();
 
-       
+        navigate("/");
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
+      setErrorMessage(error.response?.data?.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -48,6 +116,14 @@ const RegisterComp = () => {
       ...prev,
       [name]: value,
     }));
+
+    // Clear field error when user types
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
   const requiredFields = [
@@ -143,7 +219,16 @@ const RegisterComp = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="mt-8 space-y-6  h-full w-full noScroll ">
+          className="mt-8 space-y-6  h-full w-full noScroll"
+          noValidate>
+          {errorMessage && (
+            <div
+              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
+              role="alert">
+              <p>{errorMessage}</p>
+            </div>
+          )}
+
           <div className="space-y-4">
             {requiredFields.map((field, index) => (
               <div key={index}>
@@ -158,12 +243,14 @@ const RegisterComp = () => {
                     id={field.name}
                     name={field.name}
                     type={field.type}
-                    required
                     onChange={handleInput}
-                    className="appearance-none block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200"
+                    className={`appearance-none block w-full pl-10 pr-3 py-3 border ${
+                      fieldErrors[field.name] ? "border-red-500" : "border-gray-300"
+                    } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
                     placeholder={field.placeholder}
                   />
                 </div>
+                {fieldErrors[field.name] && <p className="mt-1 text-sm text-red-600">{fieldErrors[field.name]}</p>}
               </div>
             ))}
           </div>

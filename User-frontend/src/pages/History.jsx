@@ -8,11 +8,7 @@ import PageHeader from "@/components/ui/PageHeader";
 const History = () => {
   return (
     <div className="w-full h-full bg-gray-50">
-      
-      
-      <div className="h-full w-full">
-        <HistoryComponent showNavbar={false} />
-      </div>
+      <HistoryComponent showNavbar={false} />
     </div>
   );
 };

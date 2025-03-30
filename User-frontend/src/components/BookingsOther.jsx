@@ -1,12 +1,13 @@
 import React, {useState, useContext, useEffect} from "react";
 import {userContext} from "../context/Auth.context";
-import {ToastContainer, toast} from "react-toastify";
+
 import Orders from "@/components/Orders";
 import BookingNavbar from "./BookingNavbar";
 import {motion, AnimatePresence} from "framer-motion";
+import SimplePullToRefresh from "./SimplePullToRefresh";
 
 const BookingsOther = () => {
-  const {user, setUser, userLoading} = useContext(userContext);
+  const {user, setUser, userLoading, CheckUser} = useContext(userContext);
   const [UserOrders, setOrders] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,30 +25,39 @@ const BookingsOther = () => {
       order.mistri?.profession.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
+  const handleRefresh = async () => {
+    try {
+      await CheckUser();
+    } catch (error) {
+      console.error("Refresh failed:", error);
+    }
+  };
   return (
     <>
-      <ToastContainer />
-      <div className="w-full overflow-y-auto h-full bg-zinc-100 pb-[100px]">
-        {userLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <div className="w-full flex flex-col">
-            <BookingNavbar />
-            <div className="mb-4 mt-4 px-4">
-              <input
-                type="text"
-                placeholder="Search by mistri name or profession..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-         
-              <motion.div className="w-full h-full "
-               initial={{opacity: 0, y: 20}}
-               animate={{opacity: 1, y: 0}}
-               exit={{opacity: 0, y: -20}}
-               transition={{duration: 0.2}}>
+      
+      <SimplePullToRefresh onRefresh={handleRefresh}>
+        <div className="w-full overflow-y-auto h-full bg-zinc-100 pb-[100px]">
+          {userLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <div className="w-full flex flex-col">
+              <BookingNavbar />
+              <div className="mb-4 mt-4 px-4">
+                <input
+                  type="text"
+                  placeholder="Search by mistri name or profession..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+
+              <motion.div
+                className="w-full h-full "
+                initial={{opacity: 0, y: 20}}
+                animate={{opacity: 1, y: 0}}
+                exit={{opacity: 0, y: -20}}
+                transition={{duration: 0.2}}>
                 {/* <h2 className="ml-3 text-xl">Your bookings</h2> */}
                 {filteredHistory.length > 0 ? (
                   <>
@@ -93,11 +103,11 @@ const BookingsOther = () => {
                     </p>
                   </div>
                 )}
-              </ motion.div>
-           
-          </div>
-        )}
-      </div>
+              </motion.div>
+            </div>
+          )}
+        </div>
+      </SimplePullToRefresh>
     </>
   );
 };

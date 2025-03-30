@@ -10,13 +10,18 @@ import MistriCard from "./ui/MistriCard";
  * @param {Object} props
  * @param {Array} props.mistris - Array of mistri objects
  * @param {boolean} props.showBookingBtns - Whether to show booking buttons
+ * @param {Function} props.onSelectMistri - Callback when a mistri is selected
  */
-const MistriList = ({ mistris, showBookingBtns }) => {
+const MistriList = ({ mistris, showBookingBtns, onSelectMistri }) => {
   const { user } = useContext(userContext);
   const [selectedMistriId, setSelectedMistriId] = useState(null);
 
   const handleSelectMistri = (mistriId) => {
-    setSelectedMistriId(prevId => prevId === mistriId ? null : mistriId);
+    const newSelectedId = selectedMistriId === mistriId ? null : mistriId;
+    setSelectedMistriId(newSelectedId);
+    if (onSelectMistri) {
+      onSelectMistri(newSelectedId);
+    }
   };
 
   if (!mistris || mistris.length === 0) {
@@ -45,17 +50,6 @@ const MistriList = ({ mistris, showBookingBtns }) => {
           user={user}
         />
       ))}
-      
-      {/* Mobile continue button */}
-      <div className="  fixed xl:bottom-0 sm:bottom-[70px] right-0 xl:w-[80%] sm:w-full rounded-lg overflow-hidden">
-        {showBookingBtns && selectedMistriId && (
-          <div className="opacity-100 flex w-full items-center justify-center transition-all">
-            <Link to={`/book/${selectedMistriId}`} className="w-full">
-              <Button className="w-full bg-black py-6">Continue</Button>
-            </Link>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

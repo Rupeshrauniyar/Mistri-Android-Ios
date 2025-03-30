@@ -19,77 +19,65 @@ import {AuthProvider} from "./context/Auth.context.jsx";
 import {BookingNavbarProvider} from "./context/BookingNavbar.context.jsx";
 import Navbar from "./components/Navbar.jsx";
 import TopNavbar from "./components/Top-Navbar.jsx";
-function App() {
+import ScrollComponent from "./components/ScrollComponent.jsx";
+import SimplePullToRefresh from "./components/SimplePullToRefresh.jsx";
+import { useLocation } from "react-router-dom";
+
+// Component to conditionally render navigation based on path
+const AppLayout = () => {
+  const location = useLocation();
+  const path = location.pathname;
+  
+  // Paths that shouldn't show navbar/topbar
+  const noNavPaths = ['/login', '/register', '/logout'];
+  const showNav = !noNavPaths.includes(path);
+
   return (
     <>
-      <div className="w-full h-screen dark:bg-black dark:text-white bg-zinc-200 text-black flex overflow-hidden">
-        <AuthProvider>
-          <BookingNavbarProvider>
-            <Router>
-              <Navbar />
+      {showNav && <Navbar />}
+      
+      <div className="flex flex-col w-full h-screen">
+        {showNav && <TopNavbar />}
+        
+        <main className={`flex-1 ${showNav ? 'pb-16 md:pb-0 md:ml-16' : ''}`}>
+          <SimplePullToRefresh onRefresh={() => window.location.reload()}>
+            <ScrollComponent>
+              <Routes>
+                <Route element={<IsLoggedin />}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/foryou" element={<UniversalOrder />} />
+                  <Route path="/bookings" element={<Booking />} />
+                  <Route path="/history" element={<History />} />
+                  <Route path="/profile" element={<MistriProfile />} />
+                  <Route path="/dashboard" element={<MistriProfile />} />
+                </Route>
 
-              <div>
-                <TopNavbar />
-              </div>
-
-              <div className="xl:w-[80%] mt-[53px] sm:w-full h-screen dark:bg-black dark:text-white bg-zinc-100 text-black flex">
-                <Routes>
-                  <Route element={<IsLoggedin />}>
-                    <Route
-                      path="/"
-                      element={<Home />}
-                    />
-                    <Route
-                      path="/foryou"
-                      element={<UniversalOrder />}
-                    />
-                    <Route
-                      path="/bookings"
-                      element={<Booking />}
-                    />
-
-                    <Route
-                      path="/history"
-                      element={<History />}
-                    />
-                    <Route
-                      path="/profile"
-                      element={<MistriProfile />}
-                    />
-                    <Route
-                      path="/dashboard"
-                      element={<MistriProfile />}
-                    />
-                  </Route>
-
-                  <Route
-                    path="/logout"
-                    element={<Logout />}
-                  />
-                  <Route
-                    path="/login"
-                    element={<MistriLogin />}
-                  />
-                  <Route
-                    path="/register"
-                    element={<MistriRegister />}
-                  />
-                  <Route
-                    path="/settings"
-                    element={<Settings />}
-                  />
-                  {/* Not found route */}
-                  <Route
-                    path="*"
-                    element={<PageNotFound />}
-                  />
-                </Routes>
-              </div>
-            </Router>
-          </BookingNavbarProvider>
-        </AuthProvider>
+                <Route path="/logout" element={<Logout />} />
+                <Route path="/login" element={<MistriLogin />} />
+                <Route path="/register" element={<MistriRegister />} />
+                <Route path="/settings" element={<Settings />} />
+                {/* Not found route */}
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </ScrollComponent>
+          </SimplePullToRefresh>
+        </main>
       </div>
     </>
+  );
+};
+
+function App() {
+  return (
+    <div className="w-full h-screen bg-background dark:bg-background-dark text-foreground dark:text-foreground-dark">
+      <AuthProvider>
+        <BookingNavbarProvider>
+          <Router>
+            <AppLayout />
+          </Router>
+        </BookingNavbarProvider>
+      </AuthProvider>
+    </div>
   );
 }
 
