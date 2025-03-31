@@ -6,7 +6,7 @@ import PageHeader from "@/components/ui/PageHeader";
 
 const Settings = () => {
   const {user} = useContext(userContext);
-  const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") === "light" ? false : true);
+  const [darkMode, setDarkMode] = useState(localStorage.getItem("theme") ? (localStorage.getItem("theme") === "light" ? false : true) : false);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const {theme, setTheme} = useContext(userContext);

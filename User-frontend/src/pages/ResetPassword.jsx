@@ -2,15 +2,20 @@ import axios from "axios";
 import React, {useState, useEffect, useContext} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import SimplePullToRefresh from "../components/SimplePullToRefresh";
+import {useDeepLinkParams} from "../utils/deepLinkHandler";
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const ResetPassword = () => {
-  const location = useParams();
   const navigate = useNavigate();
-  const token = location.token;
-  const otp = location.otp;
-  const id = location.id;
+  const location = useParams();
+  const deepLinkParams = useDeepLinkParams();
+
+  // Use deep link params if available, otherwise use URL params
+  const token = deepLinkParams?.token || location.token;
+  const otp = deepLinkParams?.otp || location.otp;
+  const id = deepLinkParams?.id || location.id;
+
   const [loading, setLoading] = useState(true);
   const [verified, setVerified] = useState(false);
   const [formData, setFormData] = useState({
@@ -147,7 +152,7 @@ const ResetPassword = () => {
   return (
     <SimplePullToRefresh onRefresh={() => window.location.reload()}>
       {console.log(receivedEmail)}
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-dark-bg dark:to-dark-card py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-full  flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-dark-bg dark:to-dark-card py-12 px-4 sm:px-6 lg:px-8 overflow-y-auto">
         <div className="max-w-md w-full space-y-8 bg-white dark:bg-dark-card p-8 rounded-2xl shadow-xl">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
@@ -227,7 +232,7 @@ const ResetPassword = () => {
               <button
                 type="submit"
                 disabled={isResetting}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-dark-accent dark:hover:bg-dark-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-black hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-dark-accent dark:hover:bg-dark-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
                 {isResetting ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>

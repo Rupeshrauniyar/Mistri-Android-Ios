@@ -75,7 +75,7 @@ function MainApp() {
   }
 
   // Hide navbars on getstarted, login, and register pages
-  const hideNavbarPaths = ["/getstarted", "/login", "/register", "/forgot-password"];
+  const hideNavbarPaths = ["/getstarted", "/login", "/register", "/forgot-password", "/reset-password/:token/:otp/:id"];
   const showNavbars = !hideNavbarPaths.includes(location.pathname);
 
   return (

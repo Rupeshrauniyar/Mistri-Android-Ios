@@ -6,9 +6,21 @@ const userModel = require('../models/user.model.js')
 const passwordResetModel = require("../models/passwordReset.model.js")
 require("dotenv").config()
 const crypto = require("crypto")
-
+const nodemailer = require('nodemailer')
 const { userRegisterValidator } = require('../validators/user.validator.js')
 const { loginValidator } = require('../validators/login.validator.js')
+
+// Create a transporter using SMTP
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
 
 const loginController = async (req, res) => {
     try {
@@ -189,38 +201,100 @@ const verifyPasswordResetController = async (req, res) => {
 
 const forgotPasswordController = async (req, res) => {
     try {
-        const Data = req.body
-        console.log(Data.email)
-        if (Data) {
+        const { email } = req.body;
 
-            const otp = (crypto.randomBytes(3).readUIntBE(0, 3) % 900000 + 100000).toString();
-            const token = jwt.sign(Data.email, process.env.JWT)
-            const hashedOTP = jwt.sign(otp, process.env.JWT)
-
-
-            const passwordResetData = await passwordResetModel.create({
-                email: Data.email,
-                token,
-                otp: hashedOTP
-            })
-            if (passwordResetData) {
-                const redirectURL = `http://localhost:5173/reset-password/${token}/${hashedOTP}/${passwordResetData._id}`
-                res.json({ redirectURL, success: true })
-            } else {
-                res.status(404).json({ success: false, message: "Something went wrong while reseting password" })
-            }
-
-
-
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Email is required"
+            });
         }
+
+        // Check if user exists
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        // Generate OTP
+        const otp = (crypto.randomBytes(3).readUIntBE(0, 3) % 900000 + 100000).toString();
+        const token = jwt.sign(email, process.env.JWT);
+        const hashedOTP = jwt.sign(otp, process.env.JWT);
+
+        // Save reset data
+        const passwordResetData = await passwordResetModel.create({
+            email,
+            token,
+            otp: hashedOTP
+        });
+
+        if (!passwordResetData) {
+            return res.status(500).json({
+                success: false,
+                message: "Failed to create reset data"
+            });
+        }
+
+        // Create reset URL with custom scheme for mobile app
+        const resetURL = `mistri://reset-password/${token}/${hashedOTP}/${passwordResetData._id}`;
+        // Fallback web URL for desktop
+        const webResetURL = `${process.env.FRONTEND_URL}/reset-password/${token}/${hashedOTP}/${passwordResetData._id}`;
+
+        // Email template
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Password Reset Request',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
+                    <div>
+                        <h2 style="color: #333; font-size: 28px; font-weight: bold;">Reset Your Password</h2>
+                    </div>
+                    <p>Hello,</p>
+                    <p>We received a request to reset your password. Click the button below to proceed:</p>
+                    <div style="margin: 30px 0;">
+                        <a href="${resetURL}" 
+                           style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 16px; font-weight: bold;">
+                            Reset Password
+                        </a>
+                    </div>
+                    <p style="font-size: 14px; color: #666;">
+                        If you're using a desktop browser, click here: 
+                        <a href="${webResetURL}" style="color: #000; text-decoration: underline;">Reset Password (Web)</a>
+                    </p>
+                    <p>If you didn't request this, you can safely ignore this email.</p>
+                    <p>This link will expire in 15 minutes.</p>
+                    <hr style="border: 1px solid #eee; margin: 20px 0;" />
+                    <p style="color: #666; font-size: 12px;">
+                        This is an automated message. Please do not reply.
+                    </p>
+                </div>
+            `
+        };
+
+        // Send email
+        await transporter.sendMail(mailOptions);
+
+        res.json({
+            success: true,
+            message: "Password reset email sent successfully"
+        });
+
     } catch (err) {
-        res.status(401).json({ success: false, message: "Something went wrong while reseting password" })
+        console.error('Password reset error:', err);
+        res.status(500).json({
+            success: false,
+            message: "Failed to send reset email"
+        });
     }
 };
 
 const passwordResetController = async (req, res) => {
     try {
-        const { password,email } = req.body
+        const { password, email } = req.body
         if (password, email) {
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {

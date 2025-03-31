@@ -37,7 +37,7 @@ const TopNavbar = () => {
                   </>
                 ) : (
                   <Link to="/login">
-                    <button className="font-medium -500 bg-black  px-4 py-2 rounded-full">Login</button>
+                    <button className="font-medium text-white bg-black   px-4 py-2 rounded-full">Login</button>
                   </Link>
                 )}
               </div>
