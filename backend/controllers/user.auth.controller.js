@@ -285,7 +285,7 @@ const forgotPasswordController = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Failed to send reset email",
-            err
+            err: err.message
         });
     }
 };
