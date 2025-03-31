@@ -2,19 +2,19 @@ import axios from "axios";
 import React, {useState, useEffect, useContext} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import SimplePullToRefresh from "../components/SimplePullToRefresh";
-import {useDeepLinkParams} from "../utils/deepLinkHandler";
+
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useParams();
-  const deepLinkParams = useDeepLinkParams();
+
 
   // Use deep link params if available, otherwise use URL params
-  const token = deepLinkParams?.token || location.token;
-  const otp = deepLinkParams?.otp || location.otp;
-  const id = deepLinkParams?.id || location.id;
+  const token = location.token;
+  const otp = location.otp;
+  const id = location.id;
 
   const [loading, setLoading] = useState(true);
   const [verified, setVerified] = useState(false);

@@ -223,7 +223,7 @@ const forgotPasswordController = async (req, res) => {
         const otp = (crypto.randomBytes(3).readUIntBE(0, 3) % 900000 + 100000).toString();
         const token = jwt.sign(email, process.env.JWT);
         const hashedOTP = jwt.sign(otp, process.env.JWT);
-
+        const frontendUrl = process.env.FRONTEND_URL
         // Save reset data
         const passwordResetData = await passwordResetModel.create({
             email,
@@ -238,10 +238,8 @@ const forgotPasswordController = async (req, res) => {
             });
         }
 
-        // Create reset URL with custom scheme for mobile app
-        const resetURL = `mistri://reset-password/${token}/${hashedOTP}/${passwordResetData._id}`;
-        // Fallback web URL for desktop
-        const webResetURL = `${process.env.FRONTEND_URL}/reset-password/${token}/${hashedOTP}/${passwordResetData._id}`;
+        // Create reset URL
+        const resetURL = `${frontendUrl}/reset-password/${token}/${hashedOTP}/${passwordResetData._id}`;
 
         // Email template
         const mailOptions = {
@@ -249,30 +247,29 @@ const forgotPasswordController = async (req, res) => {
             to: email,
             subject: 'Password Reset Request',
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
-                    <div>
-                        <h2 style="color: #333; font-size: 28px; font-weight: bold;">Reset Your Password</h2>
-                    </div>
-                    <p>Hello,</p>
-                    <p>We received a request to reset your password. Click the button below to proceed:</p>
-                    <div style="margin: 30px 0;">
-                        <a href="${resetURL}" 
-                           style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 16px; font-weight: bold;">
-                            Reset Password
-                        </a>
-                    </div>
-                    <p style="font-size: 14px; color: #666;">
-                        If you're using a desktop browser, click here: 
-                        <a href="${webResetURL}" style="color: #000; text-decoration: underline;">Reset Password (Web)</a>
-                    </p>
-                    <p>If you didn't request this, you can safely ignore this email.</p>
-                    <p>This link will expire in 15 minutes.</p>
-                    <hr style="border: 1px solid #eee; margin: 20px 0;" />
-                    <p style="color: #666; font-size: 12px;">
-                        This is an automated message. Please do not reply.
-                    </p>
-                </div>
-            `
+               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
+      <div>
+        <h2 style="color: #333; font-size: 28px; font-weight: bold;">Reset Your Password</h2>
+      </div>
+      <p>Hello,</p>
+      <p>We received a request to reset your password. Click the button below to proceed:</p>
+      <div style="margin: 30px 0;">
+        <a
+          
+        style = "background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-size: 16px; font-weight: bold;"
+        href="${resetURL}"
+            >
+            Reset Password
+        </a >
+      </div >
+      <p>If you didn't request this, you can safely ignore this email.</p>
+      <p>This link will expire in 15 minutes.</p>
+      <hr style="border: 1px solid #eee; margin: 20px 0;" />
+      <p style="color: #666; font-size: 12px;">
+        This is an automated message. Please do not reply.
+      </p>
+    </div >
+    `
         };
 
         // Send email
