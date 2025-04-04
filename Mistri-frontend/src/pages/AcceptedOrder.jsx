@@ -30,7 +30,6 @@ const AcceptedOrder = () => {
       try {
         GetAcceptedOrder();
       } catch (err) {
-        console.log(err);
       }
     }
   }, []);

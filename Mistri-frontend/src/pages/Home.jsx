@@ -35,7 +35,7 @@ const Home = () => {
             activeOrders: response.data.activeOrders,
           }));
         } else {
-          console.log("No active orders found");
+
         }
       } catch (error) {
         console.error("Error fetching active orders:", error);

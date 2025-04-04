@@ -21,11 +21,9 @@ const resourceDirs = [
   'drawable-port-xxxhdpi'
 ];
 
-console.log('Creating resource directories...');
 resourceDirs.forEach(dir => {
   const dirPath = path.join(androidResPath, dir);
   if (!fs.existsSync(dirPath)) {
-    console.log(`Creating directory: ${dirPath}`);
     fs.mkdirSync(dirPath, { recursive: true });
   }
 });
@@ -45,7 +43,6 @@ if (!fs.existsSync(landscapeSplashImage)) {
   process.exit(1);
 }
 
-console.log('Copying splash screen images...');
 
 // Copy images to resource directories
 resourceDirs.forEach(dir => {
@@ -54,19 +51,15 @@ resourceDirs.forEach(dir => {
   
   try {
     fs.copyFileSync(sourceImage, targetPath);
-    console.log(`Copied ${sourceImage} to ${targetPath}`);
   } catch (err) {
     console.error(`Error copying to ${targetPath}:`, err);
   }
 });
 
 // Sync Capacitor project
-console.log('Syncing Capacitor project...');
 try {
   execSync('npx cap sync android', { stdio: 'inherit' });
-  console.log('Capacitor project synced successfully!');
 } catch (err) {
   console.error('Error syncing Capacitor project:', err);
 }
 
-console.log('Splash screen setup completed successfully!'); 

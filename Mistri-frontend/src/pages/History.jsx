@@ -26,7 +26,7 @@ const Bookings = () => {
           setHistory(response.data.history);
           setLoading(false);
         } else {
-          console.log("No active orders found");
+
           setLoading(false);
         }
       } catch (error) {

@@ -26,7 +26,7 @@ const Booking = () => {
           }));
           setLoading(false);
         } else {
-          console.log("No orders found");
+
           setLoading(false);
         }
       } catch (error) {

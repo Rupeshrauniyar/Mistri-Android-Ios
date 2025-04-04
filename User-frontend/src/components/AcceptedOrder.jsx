@@ -171,7 +171,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       });
 
       socket.on("receive-location", (Data) => {
-        console.log("Data", Data);
+
         if (Data.mistriPosition && (Data.mistriPosition[0] !== mistriPosition[0] || Data.mistriPosition[1] !== mistriPosition[1])) {
           setMistriPosition(Data.mistriPosition);
           setMistriPositionLoading(false);

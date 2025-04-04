@@ -63,7 +63,7 @@ const UniversalOrder = () => {
             activeOrders: response.data.order,
           }));
         } else {
-          console.log("No active orders found");
+
         }
       } catch (error) {
         console.error("Error fetching active orders:", error);
