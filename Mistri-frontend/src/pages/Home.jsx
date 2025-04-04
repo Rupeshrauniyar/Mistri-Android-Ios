@@ -1,122 +1,130 @@
-import React, { useState, useEffect, useContext } from "react";
-import Search from "../components/Search";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import MistriSkeletonLoading from "../components/Mistri.skeleton.loading";
-import { mistriContext } from "../context/Auth.context";
-import AcceptedOrdersComp from "../components/AcceptedOrdersComp";
-import BookingNavbar from "@/components/BookingNavbar";
-import { BookingContext } from "@/context/BookingNavbar.context";
+"use client";
+
+import {useContext, useState, useEffect} from "react";
 import axios from "axios";
-
-const backendURL = import.meta.env.VITE_BACKEND_URL;
-
+import {BookingContext} from "../context/BookingNavbar.context";
+import {AuthContext} from "../context/Auth.context";
+import BookingNavbar from "../components/BookingNavbar";
+import Orders from "../components/Orders";
+import {RefreshCw, CheckCircle, AlertCircle, Package, X, Clock, Filter, Loader} from "lucide-react";
+import {motion} from "framer-motion";
+import SimplePullToRefresh from "@/components/SimplePullToRefresh";
+import {Link} from "react-router-dom";
+import {Button} from "@/components/ui/button";
 const Home = () => {
-  const { mistri, setMistri, mistriLoading } = useContext(mistriContext);
-  const {
-    setUniversalOrder,
-    universalOrder,
-    activeOrder,
-    setActiveOrder,
-    setOrder,
-  } = useContext(BookingContext);
-
-  const fetchUniversalOrders = async () => {
-    if (!mistriLoading && mistri?.profession) {
-      const Data = [{profession: mistri.profession}, {rejectedOrders: mistri.rejectedOrders}];
-      try {
-        const response = await axios.post(`${backendURL}/mistri/fetch/universal-order`, Data);
-        // console.log("Universal Order Response:", response);
-
-        if (response?.data?.status === "OK" && response?.data?.order?.length > 0) {
-          setUniversalOrder(response.data.order);
-        } else {
-          // console.log("No universal orders found");
-          setUniversalOrder([]);
-        }
-      } catch (error) {
-        toast.error("Error fetching universal orders:", error);
-      }
-    } else {
-      console.warn("Mistri is loading or profession is undefined.");
-    }
-  };
-
+  const {activeOrder, setActiveOrder, setOrder} = useContext(BookingContext);
+  const {mistri, setMistri, mistriLoading} = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState({universal: "", active: "", orders: ""});
+  const [notification, setNotification] = useState({show: false, message: "", type: ""});
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [fetched, isFetched] = useState(false);
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
+  const [selected, setSelected] = useState();
   const fetchActiveOrders = async () => {
     if (!mistriLoading && mistri?._id) {
-      const Data = { id: mistri._id };
+      setError((prev) => ({...prev, active: ""}));
+
+      const Data = {id: mistri._id};
       try {
-        const response = await axios.post(
-          `${backendURL}/mistri/fetch/accepted-order`,
-          Data
-        );
-        if (response?.data?.status === "OK" && response?.data?.order) {
-          setActiveOrder(response.data.order); // Directly set orders
+        const response = await axios.post(`${backendURL}/mistri/fetch/accepted-order`, Data);
+        if (response?.data?.status === "OK" && response?.data?.activeOrders) {
+          setActiveOrder(response.data.activeOrders);
           setMistri((prev) => ({
             ...prev,
-            activeOrders: response.data.order,
+            activeOrders: response.data.activeOrders,
           }));
         } else {
           console.log("No active orders found");
         }
       } catch (error) {
         console.error("Error fetching active orders:", error);
+        setError((prev) => ({...prev, active: "Failed to fetch active orders"}));
+        showNotification("Failed to fetch active orders", "error");
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  const fetchOrders = async () => {
-    if (!mistriLoading && mistri?._id) {
-      const Data = { id: mistri._id };
-      try {
-        const response = await axios.post(
-          `${backendURL}/mistri/fetch/order`,
-          Data
-        );
-        if (response?.data?.status === "OK" && response?.data?.order) {
-          setOrder(response.data.order); // Directly set orders
-          setMistri((prev) => ({
-            ...prev,
-            orders: response.data.order,
-          }));
-        } else {
-          console.log("No orders found");
-        }
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    }
+  const showNotification = (message, type) => {
+    setNotification({show: true, message, type});
+
+    // Auto-hide notification after 4 seconds
+    setTimeout(() => {
+      setNotification((prev) => ({...prev, show: false}));
+    }, 4000);
+  };
+
+  const refreshData = async () => {
+    await fetchActiveOrders();
   };
 
   useEffect(() => {
-    if (mistri) {
-      fetchUniversalOrders();
+    if (!fetched) {
       fetchActiveOrders();
-      fetchOrders();
+      isFetched(true);
     }
-  }, []); // Only re-fetch when `mistri` changes
+  }, [fetched]);
 
+  const handleClick = (SelectedId) => {
+    setSelected(SelectedId);
+  };
   return (
     <>
-      <ToastContainer />
-      {/* {console.log("Current Universal Orders:", universalOrder)} */}
-      <div className="w-full h-full sm:pb-[120px] xl:pb-0">
-        <div className="w-full h-full overflow-y-auto noScroll">
-          {mistriLoading ? (
-            <MistriSkeletonLoading />
-          ) : mistri?.isVerified ? (
-            <>
-              <BookingNavbar />
-              <AcceptedOrdersComp />
-            </>
+      <div className="">
+        <SimplePullToRefresh onRefresh={refreshData}>
+          <BookingNavbar showBookingsAndForyouFilter={false} />
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <Loader className="animate-spin slow-spin" />
+              <p className="text-gray-600 dark:text-white">Loading...</p>
+            </div>
+          ) : mistri?.activeOrders?.length > 0 ? (
+            <div className="px-2 w-full min-h-[100vh] pb-[200px]">
+              {mistri.activeOrders
+                ?.slice()
+                .reverse()
+                .map((order, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{opacity: 0, y: 20}}
+                    animate={{opacity: 1, y: 0}}
+                    exit={{opacity: 0, y: -20}}
+                    transition={{duration: 0.3}}
+                    className={`rounded-lg ${selected ? (selected === order._id ? "ring-2 ring-black" : "ring-0 ") : ""}`}
+                    onClick={() => handleClick(order._id)}>
+                    <Orders order={order} />
+                  </motion.div>
+                ))}
+            </div>
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center">
-              <h3 className="text-5xl font-bold">You are not verified yet.</h3>
-              <p>Please wait for at least 24 hours while we verify you.</p>
+            <div className="w-full py-8 sm:py-12 flex flex-col items-center justify-center">
+              <div className="bg-gray-100 dark:bg-gray-700 p-4 sm:p-6 rounded-full mb-3 sm:mb-4">
+                <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 dark:text-gray-500" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 text-center">No orders available</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-center max-w-md text-sm sm:text-base">
+                There are currently no available orders matching your profession.
+              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-2 text-center">Check back later or refresh to see new orders</p>
             </div>
           )}
-        </div>
+        </SimplePullToRefresh>
       </div>
+
+      {selected ? (
+        <motion.div
+          initial={{opacity: 0}}
+          animate={{opacity: 1}}
+          exit={{opacity: 0}}
+          transition={{duration: 0.3}}
+          className="xl:w-[83%] fixed z-[999] xl:bottom-0 sm:bottom-[65px] w-full right-0">
+          <Link to={`/active/${selected}`}>
+            <Button className="w-full py-6">Continue</Button>
+          </Link>
+        </motion.div>
+      ) : null}
     </>
   );
 };

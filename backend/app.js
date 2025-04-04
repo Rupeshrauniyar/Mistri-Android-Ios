@@ -25,13 +25,20 @@ io.on("connection", (socket) => {
         // Handle location sharing
         socket.on("send-location", (Data) => {
             if (Data) {
+                console.log(Data)
                 // Broadcasting location to the room
-                io.to(room).emit("receive-location", {
+                io.to(Data.RoomId).emit("receive-location", {
                     userPosition: Data.userPosition,
                     mistriPosition: Data.mistriPosition,
                 });
             }
         });
+        socket.on("disconnect", () => {
+            if (room) {
+                socket.leave(room);
+            }
+        });
+
     });
 });
 
@@ -60,12 +67,12 @@ app.use("/auth/user", userAuthRoute);
 app.use("/user/favourite", userFavouriteRoute);
 app.use("/user/book/fetch/mistri", userFetchBookingMistriRoute);
 app.use("/mistri/profile", mistriProfileRoute);
-app.use("/auth/mistri", mistriAuthRoute);
+app.use("/api/mistri", mistriAuthRoute);
 app.use("/mistri/orders", MistriOrderRoute);
 app.use("/", userSearchRoute);
 // Start the server
 server.listen(PORT, () => {
-    
+
 });
 
 const autocannon = require('autocannon');

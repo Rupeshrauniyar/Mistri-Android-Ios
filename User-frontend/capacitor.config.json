@@ -1,0 +1,18 @@
+{
+  "appId": "com.mistri.user.app",
+  "appName": "Mistri",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#FFFFFF",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true,
+      "layoutName": "launch_screen"
+    }
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

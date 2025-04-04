@@ -37,8 +37,6 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
 
   // Function for mobile devices using Capacitor
 
-
-
   const getMobileLocation = async () => {
     try {
       // Check permissions first
@@ -49,7 +47,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         const requestPermission = await Geolocation.requestPermissions();
         if (requestPermission.location !== "granted") {
           setError("Location permission denied");
-            //         setPositionLoading(false);
+          //         setPositionLoading(false);
           return;
         }
       }
@@ -64,7 +62,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         (position, err) => {
           if (err) {
             setError("Error fetching geolocation");
-              //           setPositionLoading(false);
+            //           setPositionLoading(false);
             return;
           }
           const {latitude, longitude} = position.coords;
@@ -84,8 +82,8 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
     } catch (err) {
       console.error("Error in mobile location:", err);
       setError("Failed to access location services");
-        //     setPositionLoading(false);
-      alert(err)
+      //     setPositionLoading(false);
+      alert(err);
     }
   };
 
@@ -147,8 +145,8 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
 
   // Initialize location tracking
   useEffect(() => {
-    // getWebLocation();
-    getMobileLocation();
+    getWebLocation();
+    // getMobileLocation();
   }, []);
 
   // Handle retry location access
@@ -165,7 +163,11 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       socket.emit("joinRoom", {room: order._id, userId: order.user._id});
 
       socket.on("joinedRoom", () => {
-        socket.emit("send-location", {userPosition});
+        const Data = {
+          userPosition,
+          RoomId: order._id,
+        };
+        socket.emit("send-location", Data);
       });
 
       socket.on("receive-location", (Data) => {
@@ -187,12 +189,10 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
     iconUrl:
       "https://imgs.search.brave.com/ApJIYKDK7IGJuNPMwxqzH5HiB2K7pM7QJC2EpHmkqoU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wbHVz/cG5nLmNvbS9pbWct/cG5nL3BuZy1sb2Nh/dGlvbi1maWxlLWxv/Y2F0aW9uLWljb24t/cG5nLTI4Ny5wbmc",
     iconSize: [20, 30],
-  
   });
   const mistriMarker = new L.Icon({
     iconUrl: "https://pluspng.com/img-png/png-location-location-black-png-image-4231-1200.png",
     iconSize: [35, 40],
-
   });
   const polylinePoints = [userPosition, mistriPosition];
 
@@ -214,16 +214,16 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <Loader2 className="w-10 h-10 text-black animate-spin" />
-          <p className="text-gray-600">Getting your location...</p>
+          <p className="text-gray-600 dark:text-white">Getting your location...</p>
         </div>
       );
     }
-    if (error || !userPosition ) {
+    if (error || !userPosition) {
       return (
-        <div className="flex flex-col items-center justify-center h-full bg-gray-50 space-y-4 rounded-t-2xl">
+        <div className="flex flex-col items-center justify-center h-full bg-gray-50 dark:bg-zinc-800 dark:text-white space-y-4 rounded-t-2xl">
           <MapPin className="w-12 h-12 text-gray-400" />
           <div className="text-center px-4">
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-white mb-4">
               {error === "Location permission denied" ? "Please enable location access to track the service professional" : "Unable to access your location"}
             </p>
             <Button
@@ -242,7 +242,6 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         center={userPosition}
         zoom={16}
         className="w-full h-full z-20 rounded-t-2xl">
-        
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -272,8 +271,8 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   };
 
   return (
-    <div className="w-full mt-4 overflow-hidden px-4 pb-[150px]">
-      <div className="w-full bg-white rounded-2xl overflow-hidden shadow-md">
+    <div className="w-full mt-4 overflow-hidden px-4 pb-[150px] ">
+      <div className="w-full  rounded-2xl overflow-hidden shadow-md dark:bg-zinc-900 bg-white">
         {/* Map Section */}
         <div className="w-full h-[40vh] sm:h-[50vh] relative overflow-hidden">{renderMap()}</div>
 
@@ -285,7 +284,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-gray-900">{order.mistri.mistriname}</h2>
-              <p className="text-gray-600">{order.mistri.profession}</p>
+              <p className="text-gray-600 dark:text-white">{order.mistri.profession}</p>
             </div>
             <div className="text-right">
               <div className="inline-flex items-center px-3 py-1 bg-black text-white text-sm rounded-full">
@@ -300,28 +299,28 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         <div className="p-4 space-y-4">
           {/* Status */}
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700">Order Status</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-white">Order Status</span>
             <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}>{order.status}</span>
           </div>
 
           {/* Time and Location */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 dark:bg-zinc-800 dark:text-white p-4 rounded-md">
             <div className="space-y-3">
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-white">
                 <Calendar className="w-4 h-4 mr-2 shrink-0" />
                 <span className="text-sm">{order.orderDate}</span>
               </div>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-white">
                 <Clock className="w-4 h-4 mr-2 shrink-0" />
                 <span className="text-sm">{order.orderTime}</span>
               </div>
             </div>
             <div className="space-y-3">
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-white">
                 <MapPin className="w-4 h-4 mr-2 shrink-0" />
                 <span className="text-sm truncate">{order.mistri.address}</span>
               </div>
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-white">
                 <Phone className="w-4 h-4 mr-2 shrink-0" />
                 <span className="text-sm">{order.mistri.contactNumber}</span>
               </div>
@@ -329,14 +328,14 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
           </div>
 
           {/* OTP Section */}
-          <div className="bg-gray-50 p-4">
+          <div className="bg-gray-50 dark:bg-zinc-800 dark:text-white p-4 rounded-md">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">Service OTP</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-white">Service OTP</label>
               <CheckCircle className="w-5 h-5 text-green-500" />
             </div>
             <Input
               disabled
-              className="text-center font-mono text-2xl tracking-wider bg-white border-0 text-green-800"
+              className="text-center font-mono text-2xl tracking-wider dark:bg-black  border-0 text-green-800"
               value={order.otp}
             />
             <p className="text-xs text-gray-500 text-center mt-2">Share this OTP with the professional when they arrive</p>

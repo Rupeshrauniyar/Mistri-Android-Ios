@@ -14,26 +14,7 @@ const checkController = async (req, res) => {
 
             if (decoded && decoded.mistriId) {
                 const mistri = await mistriModel.findOne({ _id: decoded.mistriId }).select("-password")
-                    .populate({
-                        path: "acceptedOrder",
-                        populate: [
-                            { path: "user", select: "-contactNumber -password -email -role" },   // Populating user inside each order
-                            { path: "mistri", select: "-contactNumber -password -email -role" }  // Populating mistri inside each order
-                        ]
-                    })
-                    .populate({
-                        path: "orders",
-                        populate: [
-                            { path: "user", select: "-contactNumber -password -email -role" },   // Populating user inside each order
-                            { path: "mistri", select: "-contactNumber -password -email -role" }  // Populating mistri inside each order
-                        ]
-                    }).populate({
-                        path: "history",
-                        populate: [
-                            { path: "user", select: "-contactNumber -password -email -role" },   // Populating user inside each order
-                            { path: "mistri", select: "-contactNumber -password -email -role" }  // Populating mistri inside each order
-                        ]
-                    }).select("-otp")
+
                 if (mistri) {
 
                     return res.json({ status: "OK", mistri, message: "mistri verified successfully" });
@@ -59,12 +40,24 @@ const fetchUniversalOrder = async (req, res) => {
         const profession = req.body[0]?.profession;
         const rejectedOrders = req.body[1]?.rejectedOrders || []; // Ensure rejectedOrders is always an array
 
-        const order = await orderModel.find({ profession, status: "pending" }).populate("user").select("-password -contactNumber -role -email")
+        const order = await orderModel.find({ profession, status: "pending" }).populate({
+            path: "user",
+            select: "-email -password -contactNumber -orders -acceptedOrder -history -favourites "
+
+        })
+
+
         if (order && order.length > 0) {
             const filteredOrder = order.filter(
                 (order) => !rejectedOrders.includes(order._id.toString()) // Compare as strings
             );
-            res.json({ status: "OK", order: filteredOrder, message: "Fetched universal order successfully" });
+            if (filteredOrder.length > 0) {
+                res.json({ status: "OK", order: filteredOrder, message: "Fetched universal order successfully" });
+
+            } else {
+                res.json({ status: "OK", message: "No universal order found" });
+
+            }
         }
         else {
             res.json({ status: "OK", message: "No universal order found" });
@@ -74,39 +67,107 @@ const fetchUniversalOrder = async (req, res) => {
     }
 
 }
-const fetchOrder = async (req, res) => {
-    try {
-        const Data = req.body
-        const order = await orderModel.find({ mistri: Data.id }).populate("mistri user")
-        if (order) {
-            // const order = mistri.orders
-            res.json({ status: "OK", order, message: "Fetched order successfully" });
-        }
-        else {
-            res.json({ status: "OK", message: "No order found", });
-        }
-    } catch (err) {
-        res.json({ status: "BAD", message: "Something went wrong" })
-    }
 
-}
 const fetchAcceptedOrder = async (req, res) => {
     try {
         const Data = req.body
-        const mistri = await mistriModel.findOne({ _id: Data.id }).populate("acceptedOrder")
+        // console.log(Data)
+        const mistri = await mistriModel.findOne({ _id: Data.id }).populate({
 
-        if (mistri && mistri.length > 0) {
+            path: "acceptedOrder orders",
+            select: "-otp -mistri",
+            populate: {
+                path: "user",
+                select: "-email -password -contactNumber -orders -acceptedOrder -history -favourites "
 
-            res.json({ status: "OK", mistri, message: "Fetched accepted order successfully" });
+            }
+        })
+
+        if (mistri && mistri._id) {
+
+            res.json({ status: "OK", activeOrders: mistri.acceptedOrder, message: "Fetched accepted order successfully" });
         }
         else {
             res.json({ status: "OK", message: "No accepted order found", });
         }
     } catch (err) {
         res.json({ status: "BAD", message: "Something went wrong" })
+        console.error(err.message)
     }
 
 }
 
+const fetchOrders = async (req, res) => {
+    const Data = req.body
+    try {
+        if (Data) {
+            const orders = await orderModel.find({ mistri: Data.id }).select("-otp -mistri").populate({
+                path: "user",
+                select: "-email -password -contactNumber -orders -acceptedOrder -history -favourites "
 
-module.exports = { checkController, fetchUniversalOrder, fetchOrder, fetchAcceptedOrder } 
+            })
+            if (orders) {
+                res.status(200).json({ orders, status: "OK" })
+            } else {
+                res.status(404).json({ status: "BAD" })
+
+            }
+        }
+    } catch (err) {
+        res.status(404).json({ status: "BAD" })
+    }
+}
+
+const fetchParticularAcceptedOrder = async (req, res) => {
+    const Data = req.body
+    if (Data) {
+        console.log(Data.id)
+        const id = Data.id.toString()
+        try {
+            const order = await orderModel.findOne({ _id: id }).select("-otp").populate({
+                path: "user",
+                select: "-password -email -contactNumber -orders -acceptedOrder -history "
+            })
+            // console.log(order)
+            if (order && order._id) {
+                res.status(200).json({ status: "OK", order })
+            } else {
+                res.status(401).json({ status: 'BAD', msg: "Not found" })
+            }
+        } catch (err) {
+            res.status(401).json({ status: 'BAD', err })
+        }
+    } else {
+        res.status(401).json({ status: 'BAD', msg: "Data not available" })
+    }
+}
+
+const fetchHistory = async (req, res) => {
+    const Data = req.body
+    try {
+        if (Data) {
+            const order = await mistriModel.findOne({ _id: Data.id }).populate({
+                path: "history",
+                select: "-otp -mistri",
+                populate: {
+                    path: "user",
+                    select: "-email -password -contactNumber -orders -acceptedOrder -history -favourites "
+                },
+
+            }).select("-password")
+            if (order) {
+                const history = order.history
+                console.log(history)
+                res.status(200).json({ history, status: "OK" })
+            } else {
+                res.status(404).json({ status: "BAD" })
+
+            }
+        }
+    } catch (err) {
+        res.status(404).json({ status: "BAD" })
+    }
+}
+
+
+module.exports = { checkController, fetchUniversalOrder, fetchOrders, fetchAcceptedOrder, fetchParticularAcceptedOrder, fetchHistory } 

@@ -3,13 +3,11 @@ import React, {useState, useEffect, useContext} from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import SimplePullToRefresh from "../components/SimplePullToRefresh";
 
-
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const location = useParams();
-
 
   // Use deep link params if available, otherwise use URL params
   const token = location.token;
@@ -107,7 +105,7 @@ const ResetPassword = () => {
 
   if (!verified) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-dark-bg dark:to-dark-card py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center dark:bg-black bg-white  py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 bg-white dark:bg-dark-card p-8 rounded-2xl shadow-xl">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
@@ -152,8 +150,8 @@ const ResetPassword = () => {
   return (
     <SimplePullToRefresh onRefresh={() => window.location.reload()}>
       {console.log(receivedEmail)}
-      <div className="min-h-full  flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-dark-bg dark:to-dark-card py-12 px-4 sm:px-6 lg:px-8 overflow-y-auto">
-        <div className="max-w-md w-full space-y-8 bg-white dark:bg-dark-card p-8 rounded-2xl shadow-xl">
+      <div className="h-full  flex items-center justify-center bg-zinc-100 dark:bg-black  py-12 px-4 sm:px-6 lg:px-8 overflow-y-auto">
+        <div className=" w-full  bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-xl">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
               <svg
@@ -201,7 +199,7 @@ const ResetPassword = () => {
                   type="password"
                   required
                   minLength={6}
-                  className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
+                  className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
                   placeholder="Enter new password"
                   value={formData.password}
                   onChange={handleChange}
@@ -220,7 +218,7 @@ const ResetPassword = () => {
                   type="password"
                   required
                   minLength={6}
-                  className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
+                  className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
                   placeholder="Confirm new password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -232,7 +230,7 @@ const ResetPassword = () => {
               <button
                 type="submit"
                 disabled={isResetting}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-black hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-dark-accent dark:hover:bg-dark-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-black hover:bg-zinc-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-dark-accent dark:hover:bg-dark-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]">
                 {isResetting ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>

@@ -2,7 +2,7 @@ import React, {useState, createContext} from "react";
 export const BookingContext = createContext();
 
 export const BookingNavbarProvider = ({children}) => {
-  const [universalOrder, setUniversalOrder] = useState();
+  const [universalOrder, setUniversalOrder] = useState([]);
   const [activeOrder, setActiveOrder] = useState([]);
   const [order, setOrder] = useState([]);
 

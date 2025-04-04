@@ -10,8 +10,8 @@ router.post("/register", upload.fields([
     { name: 'profileImage' },   // Handle 'profileImage'
     { name: 'idProof' }         // Handle 'idProof'
 ]), authController.registerController)
-router.get("/verify", authController.verifyController)
-router.get("/reset", authController.resetController)
+router.get("/api/verify", authController.verifyController)
+router.get("/api/reset", authController.resetController)
 
 
 

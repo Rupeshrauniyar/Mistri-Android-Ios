@@ -13,6 +13,7 @@ import MistriCard from "./ui/MistriCard";
  * @param {Function} props.onSelectMistri - Callback when a mistri is selected
  */
 const MistriList = ({ mistris, showBookingBtns, onSelectMistri }) => {
+  
   const { user } = useContext(userContext);
   const [selectedMistriId, setSelectedMistriId] = useState(null);
 

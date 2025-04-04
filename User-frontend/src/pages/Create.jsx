@@ -71,7 +71,7 @@ const Create = () => {
       });
 
       if (response.data && response.data.order) {
-        navigate("/bookings");
+        navigate("/bookings/other");
       } else {
         // Remove toast.error
       }
@@ -275,7 +275,7 @@ const Create = () => {
                     placeholder="Enter amount"
                     value={formData.Charges || ""}
                     onChange={(e) => handleInputChange("Charges", e.target.value)}
-                    className={`w-full dark:bg-black pl-8 pr-3 py-3 border ${
+                    className={`w-full dark:bg-black dark:text-white text-black pl-8 pr-3 py-3 border ${
                       errors.Charges ? "border-red-500" : " border-gray-300 dark:border-zinc-800"
                     } rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-200`}
                   />

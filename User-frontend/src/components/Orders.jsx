@@ -34,13 +34,11 @@ const Orders = ({order}) => {
               "https://imgs.search.brave.com/oJmhCNRk22fQdZbu84cZUAGtfWey9UBMhi06dAXg6lw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9jcmVhdGUtcGlj/dHVyZS10aGF0LXJl/cHJlc2VudHMtZGl2/ZXJzZS10ZWFtLWNv/bnN0cnVjdGlvbi13/b3JrZXJzLXN1Z2dl/c3RpbmctY29sbGFi/b3JhdGl2ZS1lXzkz/OTAzMy0xMDI1NDYu/anBnP3NpemU9NjI2/JmV4dD1qcGc"
             }
             alt={order.mistri?.mistriname}
-            className="w-12 h-12 rounded-full object-cover"
+            className="w-12 h-12 shadow-xl border border-black rounded-full object-cover"
           />
           <div>
-            <h3 className={`font-semibold text-lg ${order.mistri ? "" : "text-gray-400"}`}>
-              {order.mistri ? order.mistri.mistriname.slice(0, 10) : "Pending"}
-            </h3>
-            <p className="text-gray-600 text-sm">{order.mistri?.profession}</p>
+            <h3 className={`font-bold text-lg ${order.mistri ? "" : "text-zinc-500 "}`}>{order.mistri ? order.mistri.mistriname.slice(0, 10) : "Pending"}</h3>
+            <p className="text-gray-600 text-sm">{order.mistri ? order.mistri.profession : order.profession}</p>
           </div>
         </div>
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>{order.status}</span>
@@ -67,7 +65,7 @@ const Orders = ({order}) => {
 
       <div className="flex justify-between items-center text-sm text-gray-500 pt-3 border-t">
         <p>Order ID: {order._id.slice(-8)}...</p>
-        <p>Created at: {formatDate(order.createdAt)}</p>
+        <p>{formatDate(order.createdAt)}</p>
       </div>
     </div>
   );

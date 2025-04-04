@@ -151,7 +151,7 @@ const LoginComp = (props) => {
   }
 
   return (
-    <div className="w-full h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:bg-black dark:text-white bg-gray-50">
+    <div className="w-full h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:bg-black dark:text-white text-black bg-gray-50">
       <div className="w-full h-full max-w-md flex flex-col item-center justify-center">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold dark:text-gray-200 text-gray-900">Welcome back</h2>
@@ -170,7 +170,7 @@ const LoginComp = (props) => {
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-4 dark:text-white">
             {requiredFields.map((field, index) => (
               <div key={index}>
                 <label
@@ -178,16 +178,16 @@ const LoginComp = (props) => {
                   className="block text-sm font-medium dark:text-white text-gray-700">
                   {field.label}
                 </label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">{field.svg}</div>
+                <div className="mt-1 relative dark:text-white dark:bg-black">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none dark:text-white ">{field.svg}</div>
                   <input
                     id={field.name}
                     name={field.name}
                     type={field.type}
                     onChange={handleInput}
-                    className={`appearance-none dark:text-black dark:bg-black block w-full pl-10 pr-3 py-3 border ${
+                    className={`appearance-none dark:text-white dark:bg-black block w-full pl-10 pr-3 py-3 border ${
                       fieldErrors[field.name] ? "border-red-500" : "border-gray-300"
-                    } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
+                    } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 dark:focus:ring-zinc-300 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
                     placeholder={field.placeholder}
                   />
                 </div>

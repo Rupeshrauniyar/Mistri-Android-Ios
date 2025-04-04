@@ -15,7 +15,7 @@ const TopNavbar = () => {
             <div className="flex items-center space-x-3">
               <div className="relative">
                 {user ? (
-                  <div className="w-10 h-10 bg-gradient-to-br from-black to-gray-700  rounded-full flex items-center justify-center font-bold shadow-md">
+                  <div className="w-10 h-10 bg-gradient-to-br from-black to-gray-700 text-zinc-200  rounded-full flex items-center justify-center font-bold shadow-md">
                     {user?.username?.charAt(0).toUpperCase()}
                   </div>
                 ) : (

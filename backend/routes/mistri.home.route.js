@@ -8,7 +8,13 @@ const mistriHomeController = require("../controllers/mistri.home.controller.js")
 router.post("/check", mistriHomeController.checkController)
 router.post("/fetch/universal-order", mistriHomeController.fetchUniversalOrder)
 router.post("/fetch/accepted-order", mistriHomeController.fetchAcceptedOrder)
-router.post("/fetch/order", mistriHomeController.fetchOrder)
+router.post("/fetch/order", mistriHomeController.fetchOrders)
+router.post("/fetch/history", mistriHomeController.fetchHistory)
+
+
+router.post("/fetch/particular-accepted-order", mistriHomeController.fetchParticularAcceptedOrder)
+
+
 
 
 

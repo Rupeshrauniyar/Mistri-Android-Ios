@@ -79,7 +79,7 @@ const Settings = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen dark:bg-black  mt-3 pb-[100px]">
+    <div className="w-full min-h-full dark:bg-black  mt-3 sm:pb-[750px]">
       <div className="px-2"></div>
 
       <div className="p-4">

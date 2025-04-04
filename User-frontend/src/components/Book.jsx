@@ -42,7 +42,7 @@ const Book = () => {
         ...formData,
         token
       });
-      navigate('/bookings');
+      navigate('/bookings/other');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create booking');
     }

@@ -144,9 +144,9 @@ const Bookings = () => {
         <motion.div
           initial={{opacity: 0}}
           animate={{opacity: 1}}
-          className="sm:w-full xl:w-[81%] fixed xl:bottom-0 sm:bottom-[60px] right-0 text-2xl font-bold z-50">
+          className="sm:w-full xl:w-[82%]  fixed xl:bottom-0 sm:bottom-[60px] right-0 text-2xl font-bold z-50">
           <Link to={`/bookings/active/${selectedLink}`}>
-            <Button className="w-full h-[50px]">Continue</Button>
+            <Button className="w-full h-[50px] bg-black dark:bg-zinc-900 dark:hover:bg-zinc-700">Continue</Button>
           </Link>
         </motion.div>
       )}

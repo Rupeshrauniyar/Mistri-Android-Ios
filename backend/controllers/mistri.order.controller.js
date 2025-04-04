@@ -89,6 +89,7 @@ const MistriOrderAcceptController = async (req, res) => {
                         mistri: Data.mistriId,
                     },
                     { new: true }).populate("user mistri").select("-password -contactName -role -email")
+
                 const user = await userModel.findByIdAndUpdate(Data.userId, {
                     $push: { acceptedOrder: order._id },
                 }, { new: true }).select("-password -contactName -role -email")
@@ -99,6 +100,7 @@ const MistriOrderAcceptController = async (req, res) => {
                     },
                     { new: true }
                 ).select("-password -contactName -role -email")
+                
                 res.json({ status: "OK", order, user, mistri, type: "universal" })
             } else {
 

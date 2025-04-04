@@ -1,10 +1,10 @@
 import React, {useContext, useState} from "react";
-import {mistriContext} from "../context/Auth.context";
+import {AuthContext} from "../context/Auth.context";
 import {Link} from "react-router-dom";
 import {Search, Menu, Bell, User, LogOut, Settings} from "lucide-react";
 
 const TopNavbar = () => {
-  const {mistri} = useContext(mistriContext);
+  const {mistri} = useContext(AuthContext);
 
   return (
     <>
@@ -15,7 +15,7 @@ const TopNavbar = () => {
             <div className="flex items-center space-x-3">
               <div className="relative">
                 {mistri ? (
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-700 text-white rounded-full flex items-center justify-center font-bold shadow-md">
+                  <div className="w-10 h-10 bg-gradient-to-br bg-black text-white rounded-full flex items-center justify-center font-bold shadow-md">
                     {mistri?.mistriname?.charAt(0).toUpperCase()}
                   </div>
                 ) : (
@@ -38,7 +38,7 @@ const TopNavbar = () => {
                   </>
                 ) : (
                   <Link to="/login">
-                    <button className="btn-primary">Login</button>
+                    <button className="bg-black">Login</button>
                   </Link>
                 )}
               </div>
@@ -69,8 +69,7 @@ const TopNavbar = () => {
         </div>
       </div>
 
-      {/* Spacer to prevent content from hiding behind the navbar */}
-      <div className="h-16"></div>
+
     </>
   );
 };

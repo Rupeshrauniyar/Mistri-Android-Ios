@@ -1,41 +1,63 @@
 import React, {useState} from "react";
 
 const MistriSkeletonLoading = () => {
-  const [mistrisLoadingArray, setMistrisLoadingArray] = useState([{}, {}, {}, {}, {}, {}, {}, {}]);
+  const [mistrisLoadingArray] = useState([{}, {}, {}, {}, {}, {}, {}, {}]);
 
   return (
-    <div className="noScroll w-full h-full overflow-y-auto flex flex-wrap">
-      {mistrisLoadingArray.map((a, index) => (
+    <>
+      {mistrisLoadingArray.map((_, i) => (
         <div
-          key={index}
-          className="xl:w-[280px] sm:w-full xl:h-[370px] sm:h-[440px] bg-white rounded-md overflow-hidden m-2">
-          <div className="w-full h-[50%] overflow-hidden animate-pulse bg-zinc-200"></div>
-          <div className="flex items-center justify-between ">
-            <span></span>
+          key={i}
+          className="relative dark:bg-zinc-900 bg-white rounded-xl overflow-hidden transition-all duration-300 sm:w-full xl:w-[280px] xl:h-[300px] mb-4 xl:mr-4">
+          {/* Image Section with Gradient Overlay */}
+          <div className="relative h-48 overflow-hidden">
+            <div className="w-full h-full bg-gray-200 animate-pulse" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+              {/* Name and Profession Skeleton */}
+              <div className="h-6 w-32 bg-gray-300 rounded-md mb-2 animate-pulse" />
+              <div className="h-4 w-24 bg-gray-300 rounded-md animate-pulse" />
+            </div>
+          </div>
 
-            <span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                aria-label="Settings"
-                className="p-1"
-                fill="currentColor"
-                height="24"
-                role="img"
-                viewBox="0 0 24 24"
-                width="24">
-                <path d="M12.0006 15.968L16.2473 18.3451L15.2988 13.5717L18.8719 10.2674L14.039 9.69434L12.0006 5.27502V15.968ZM12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"></path>
-              </svg>
-            </span>
+          {/* Content Section */}
+          <div className="p-4">
+            {/* Rating and Price */}
+            <div className="flex justify-between items-center mb-3">
+              <div className="h-4 w-12 bg-gray-200 rounded-md animate-pulse" />
+              <div className="h-4 w-16 bg-gray-200 rounded-md animate-pulse" />
+            </div>
+
+            {/* Location and Experience */}
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 bg-gray-200 rounded-full animate-pulse" />
+                <div className="h-4 w-3/4 bg-gray-200 rounded-md animate-pulse" />
+              </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 bg-gray-200 rounded-full animate-pulse" />
+                <div className="h-4 w-2/3 bg-gray-200 rounded-md animate-pulse" />
+              </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 mr-2 bg-gray-200 rounded-full animate-pulse" />
+                <div className="h-4 w-3/4 bg-gray-200 rounded-md animate-pulse" />
+              </div>
+            </div>
+
+            {/* Booking Button Skeleton - Desktop */}
+            <div className="sm:hidden xl:block">
+              <div className="w-full h-9 bg-gray-200 rounded-md animate-pulse" />
+            </div>
           </div>
-          <div className="w-full flex items-center justify-center p-1 ">
-            <div className="overflow-hidden truncate w-[80%] h-[10px] rounded-md animate-pulse bg-zinc-200"></div>
-          </div>
-          <div className="flex flex-col items-center justify-center p-1 ">
-            <div className="overflow-hidden truncate w-[40%] h-[10px] rounded-md animate-pulse bg-zinc-200"></div>
+
+          {/* Tags */}
+          <div className="absolute top-4 right-4 flex flex-col gap-2">
+            <div className="h-5 w-16 bg-gray-200 rounded-full animate-pulse" />
+            <div className="h-5 w-16 bg-gray-200 rounded-full animate-pulse" />
           </div>
         </div>
       ))}
-    </div>
+    </>
   );
 };
 

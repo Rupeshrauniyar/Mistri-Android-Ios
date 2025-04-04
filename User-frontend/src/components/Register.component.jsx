@@ -210,70 +210,68 @@ const RegisterComp = () => {
   ];
 
   return (
-    <div className="w-full min-h-full  flex items-center justify-center dark:bg-black dark:text-white bg-gray-50 pb-20 py-10  noScroll">
-      <div className=" h-full noScroll flex flex-col item-center justify-center ">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold dark:text-white text-gray-900">Create an account</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-white">Join Mistri to find the best professionals for your needs</p>
+    <div className="max-w-3xl h-full xl:mt-16  xl:flex xl:flex-col items-center justify-center dark:bg-black dark:text-white  px-6 overflow-y-auto  noScroll">
+      <div className="text-center">
+        <h2 className="text-3xl font-extrabold dark:text-white text-gray-900">Create an account</h2>
+        <p className="mt-2 text-sm text-gray-600 dark:text-white">Join Mistri to find the best professionals for your needs</p>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="mt-8 space-y-6  h-full w-full noScroll"
+        noValidate>
+        {errorMessage && (
+          <div
+            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
+            role="alert">
+            <p>{errorMessage}</p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          {requiredFields.map((field, index) => (
+            <div key={index}>
+              <label
+                htmlFor={field.name}
+                className="block text-sm font-medium text-gray-700 dark:text-white">
+                {field.label}
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">{field.svg}</div>
+                <input
+                  id={field.name}
+                  name={field.name}
+                  type={field.type}
+                  onChange={handleInput}
+                  className={`appearance-none dark:bg-black block w-full pl-10 pr-3 py-3 border ${
+                    fieldErrors[field.name] ? "border-red-500" : "border-gray-300"
+                  } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
+                  placeholder={field.placeholder}
+                />
+              </div>
+              {fieldErrors[field.name] && <p className="mt-1 text-sm text-red-600">{fieldErrors[field.name]}</p>}
+            </div>
+          ))}
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-6  h-full w-full noScroll"
-          noValidate>
-          {errorMessage && (
-            <div
-              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg"
-              role="alert">
-              <p>{errorMessage}</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {requiredFields.map((field, index) => (
-              <div key={index}>
-                <label
-                  htmlFor={field.name}
-                  className="block text-sm font-medium text-gray-700 dark:text-white">
-                  {field.label}
-                </label>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">{field.svg}</div>
-                  <input
-                    id={field.name}
-                    name={field.name}
-                    type={field.type}
-                    onChange={handleInput}
-                    className={`appearance-none dark:bg-black block w-full pl-10 pr-3 py-3 border ${
-                      fieldErrors[field.name] ? "border-red-500" : "border-gray-300"
-                    } rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
-                    placeholder={field.placeholder}
-                  />
-                </div>
-                {fieldErrors[field.name] && <p className="mt-1 text-sm text-red-600">{fieldErrors[field.name]}</p>}
-              </div>
-            ))}
+        <div className="w-full flex items-center justify-between">
+          <div className="text-sm flex w-full">
+            <span className="text-gray-600 dark:text-white">Already have an account? </span>
+            <Link
+              to="/login"
+              className="font-medium dark:text-zinc-200 ml-2 text-black hover:text-gray-800 transition-colors">
+              Sign in
+            </Link>
           </div>
+        </div>
 
-          <div className="w-full flex items-center justify-between">
-            <div className="text-sm flex w-full">
-              <span className="text-gray-600 dark:text-white">Already have an account? </span>
-              <Link
-                to="/login"
-                className="font-medium dark:text-zinc-200 ml-2 text-black hover:text-gray-800 transition-colors">
-                Sign in
-              </Link>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black dark:bg-zinc-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create account"}
-          </button>
-        </form>
-      </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black dark:bg-zinc-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create account"}
+        </button>
+      </form>
     </div>
   );
 };

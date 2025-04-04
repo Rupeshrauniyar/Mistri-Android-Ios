@@ -8,7 +8,7 @@ const MistriSkeletonLoading = () => {
       {mistrisLoadingArray.map((_, i) => (
         <div
           key={i}
-          className="relative bg-white rounded-xl overflow-hidden transition-all duration-300 sm:w-full xl:w-[280px] xl:h-[300px] mb-4 xl:mr-4"
+          className="relative dark:bg-zinc-900 bg-white rounded-xl overflow-hidden transition-all duration-300 sm:w-full xl:w-[280px] xl:h-[300px] mb-4 xl:mr-4"
         >
           {/* Image Section with Gradient Overlay */}
           <div className="relative h-48 overflow-hidden">

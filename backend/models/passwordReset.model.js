@@ -12,6 +12,10 @@ const passwordResetSchema = mongoose.Schema({
     otp: {
         type: String,
         required: true
+    },
+    changedAt: {
+        type: Date,
+        default: Date.now
     }
 })
 

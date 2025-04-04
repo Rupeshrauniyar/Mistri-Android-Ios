@@ -37,8 +37,8 @@ const ForgotPassword = () => {
   };
   return (
     <SimplePullToRefresh onRefresh={() => window.location.reload()}>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-dark-bg dark:to-dark-card py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8 bg-white dark:bg-dark-card p-8 rounded-2xl shadow-xl">
+      <div className="min-h-screen flex items-center justify-center dark:bg-black bg-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full space-y-8 bg-white dark:bg-zinc-900 p-8 rounded-2xl shadow-xl">
           <div className="text-center">
             <div className="mx-auto h-12 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
               <svg
@@ -84,7 +84,7 @@ const ForgotPassword = () => {
                     name="email"
                     type="email"
                     required
-                    className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
+                    className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

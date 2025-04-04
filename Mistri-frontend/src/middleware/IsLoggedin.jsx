@@ -1,10 +1,10 @@
 import React, {useContext, useEffect} from "react";
 import {Outlet, useNavigate} from "react-router-dom";
-import {mistriContext} from "../context/Auth.context";
+import {AuthContext} from "../context/Auth.context";
 
 const IsLoggedin = () => {
   const navigate = useNavigate();
-  const {mistri, mistriLoading, setMistri} = useContext(mistriContext);
+  const {mistri, mistriLoading, setMistri} = useContext(AuthContext);
   const token = localStorage.getItem("token");
   useEffect(() => {
     if (!token) {

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mistri</string>
+    <string name="title_activity_main">Mistri</string>
+    <string name="package_name">com.mistri.user.app</string>
+    <string name="custom_url_scheme">com.mistri.user.app</string>
+</resources>

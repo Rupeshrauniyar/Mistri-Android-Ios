@@ -31,7 +31,7 @@ const ActiveOrdersComp = ({order}) => {
           <img
             src={order.mistri?.profileImage || "/default-avatar.png"}
             alt={order.mistri?.mistriname}
-            className="w-12 h-12 rounded-full object-cover"
+            className="w-12 h-12 shadow-xl border border-black rounded-full object-cover"
           />
           <div>
             <h3 className="font-semibold text-lg">{order.mistri?.mistriname.slice(0, 10)}...</h3>
@@ -44,7 +44,7 @@ const ActiveOrdersComp = ({order}) => {
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <p className="text-sm text-gray-500">Date</p>
-          <p className="font-medium">{(order.orderDate)}</p>
+          <p className="font-medium">{order.orderDate}</p>
         </div>
         <div>
           <p className="text-sm text-gray-500">Time</p>
@@ -62,7 +62,7 @@ const ActiveOrdersComp = ({order}) => {
 
       <div className="flex justify-between items-center text-sm text-gray-500 pt-3 border-t">
         <p>Order ID: {order._id.slice(-8)}...</p>
-        <p>Created {formatDate(order.createdAt)}</p>
+        <p>{formatDate(order.createdAt)}</p>
       </div>
     </div>
   );

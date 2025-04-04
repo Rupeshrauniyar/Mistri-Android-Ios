@@ -17,7 +17,7 @@ const Input = React.forwardRef(({ className, type, leftIcon, rightIcon, error, .
           "flex h-10 w-full rounded-lg border transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm",
           "border-gray-300 dark:border-gray-700",
           "placeholder:text-gray-400 dark:placeholder:text-gray-600",
-          "focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-800 focus:border-primary",
+          "focus:outline-none focus:ring-2 focus:ring-black-200 dark:focus:ring-black-800 focus:border-black",
           "disabled:cursor-not-allowed disabled:opacity-50",
           leftIcon && "pl-10",
           rightIcon && "pr-10",

@@ -1,20 +1,20 @@
-import React, { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, {useEffect, useRef} from "react";
+import {useLocation} from "react-router-dom";
 
-const ScrollComponent = ({ children }) => {
+const ScrollComponent = ({children}) => {
   const location = useLocation();
   const mainContainerRef = useRef(null);
 
   useEffect(() => {
-    const container = mainContainerRef.current?.querySelector('[data-scroll-container]');
+    const container = mainContainerRef.current?.querySelector("[data-scroll-container]");
     if (!container) return;
 
     // Scroll to top on route change, except for specific routes that handle their own scrolling
-    const noScrollRoutes = ['/bookings', '/history', '/profile', '/foryou'];
+    const noScrollRoutes = ["/bookings", "/history", "/create", "/profile"];
     if (!noScrollRoutes.includes(location.pathname)) {
       container.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
 
@@ -26,29 +26,31 @@ const ScrollComponent = ({ children }) => {
     };
 
     // Add scroll event listener
-    container.addEventListener('scroll', saveScrollPosition, { passive: true });
+    container.addEventListener("scroll", saveScrollPosition, {passive: true});
 
     // Restore scroll position if it exists
     const savedPosition = sessionStorage.getItem(`scroll_${location.pathname}`);
     if (savedPosition && noScrollRoutes.includes(location.pathname)) {
       container.scrollTo({
         top: parseInt(savedPosition),
-        behavior: 'auto'
+        behavior: "auto",
       });
     }
 
     return () => {
       // Clean up
       saveScrollPosition();
-      container.removeEventListener('scroll', saveScrollPosition);
+      container.removeEventListener("scroll", saveScrollPosition);
     };
   }, [location.pathname]);
 
   return (
-    <div ref={mainContainerRef} className="w-full h-full flex flex-col">
+    <div
+      ref={mainContainerRef}
+      className="w-full h-full flex flex-col">
       {children}
     </div>
   );
 };
 
-export default ScrollComponent; 
+export default ScrollComponent;
