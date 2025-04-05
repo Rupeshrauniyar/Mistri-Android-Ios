@@ -27,7 +27,6 @@ const Notification = () => {
   };
   return (
     <div className="w-full h-full p-4 mt-2 overflow-y-auto">
-      {console.log(user)}
       <SimplePullToRefresh onRefresh={handleRefresh}>
         <h3 className="font-bold text-2xl mb-1">Notifications </h3>
         <hr />

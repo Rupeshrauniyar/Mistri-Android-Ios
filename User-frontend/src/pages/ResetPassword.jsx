@@ -149,7 +149,6 @@ const ResetPassword = () => {
 
   return (
     <SimplePullToRefresh onRefresh={() => window.location.reload()}>
-      {console.log(receivedEmail)}
       <div className="h-full  flex items-center justify-center bg-zinc-100 dark:bg-black  py-12 px-4 sm:px-6 lg:px-8 overflow-y-auto">
         <div className=" w-full  bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-xl">
           <div className="text-center">

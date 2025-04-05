@@ -14,7 +14,6 @@ const BookingsOther = () => {
 
   useEffect(() => {
     const pending = user.orders.filter((order) => order.status === "pending");
-    // console.log(pending);
     user.orders.length > 0 ? setOrders(pending) : setOrders([]);
   }, [user]);
   const filteredHistory = UserOrders.filter((order) => {

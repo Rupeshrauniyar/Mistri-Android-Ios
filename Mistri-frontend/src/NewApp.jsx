@@ -1,5 +1,5 @@
 import {useState, useEffect, useContext} from "react";
-// import {App} from "@capacitor/app";
+import {App} from "@capacitor/app";
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import IsLoggedin from "./middleware/IsLoggedin.jsx";
 // Universal pages
@@ -68,21 +68,8 @@ function NewApp() {
     );
   }
 
-  if (!mistri.isVerified === true) {
-    return (
-      <div className="w-full py-8 sm:py-12 flex flex-col items-center justify-center  ">
-        <div className="bg-gray-100 dark:bg-gray-700 p-4 sm:p-6 rounded-full mb-3 sm:mb-4">
-          <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 dark:text-gray-500" />
-        </div>
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 text-center">You are not verified yet!</h3>
-        <p className="text-gray-600 dark:text-gray-300 text-center max-w-md text-sm sm:text-base">Please wait 24 Hours till we verify you.</p>
-        <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-2 text-center">Check back later or refresh.</p>
-      </div>
-    );
-  }
   // Hide navbars on getstarted, login, and register pages
-  const hideNavbarPaths = ["/getstarted", "/login", "/register", "/forgot-password", "/reset-password/:token/:otp/:id"];
-  const showNavbars = !hideNavbarPaths.includes(location.pathname);
+  const showNavbars = mistri?._id;
 
   return (
     <>

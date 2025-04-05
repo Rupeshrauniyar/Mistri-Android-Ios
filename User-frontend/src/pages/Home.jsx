@@ -69,7 +69,6 @@ const Home = () => {
 
   return (
     <>
-      {/* {console.log(mistris)} */}
       <div className="w-full min-h-full ">
         <SimplePullToRefresh onRefresh={handleRefresh}>
           <div className={` ${hidden === true ? "hidden" : "flex"} items-center justify-center xl:w-[80%] sm:w-full h-full fixed z-20`}>

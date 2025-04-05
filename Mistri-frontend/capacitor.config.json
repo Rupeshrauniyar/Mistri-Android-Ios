@@ -4,12 +4,13 @@
   "webDir": "dist",
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 2000,
+      "launchShowDuration": 3000,
       "backgroundColor": "#FFFFFF",
+      "androidSplashResourceName": "mistri_splash",
+      "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
       "splashFullScreen": true,
-      "splashImmersive": true,
-      "layoutName": "launch_screen"
+      "splashImmersive": true
     }
   },
   "server": {

@@ -172,7 +172,6 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       });
 
       socket.on("receive-location", (Data) => {
-
         if (Data.userPosition && (Data.userPosition[0] !== userPosition[0] || Data.userPosition[1] !== userPosition[1])) {
           setUserPosition(Data.userPosition);
           setUserPositionLoading(false);
@@ -184,7 +183,6 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         socket.off("receive-location");
       };
     } else {
-
     }
   }, [mistriPosition, error, order._id, order.user._id]);
 
