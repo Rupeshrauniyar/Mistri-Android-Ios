@@ -59,6 +59,9 @@ const userBookingRoute = require("./routes/user.booking.route.js");
 const userFetchBookingMistriRoute = require("./routes/user.mistri.booking.fetch.route.js");
 const MistriOrderRoute = require("./routes/mistri.order.route.js");
 const userSearchRoute = require("./routes/user.search.route")
+app.get("/keep-alive",(req,res)=>{
+    res.send("Keep alive")
+})
 app.use("/user", userHomeRoute);
 app.use("/mistri", mistriHomeRoute);
 app.use("/user/booking", userBookingRoute);
