@@ -50,6 +50,7 @@ const Bookings = () => {
     <>
       <div className="">
         <SimplePullToRefresh onRefresh={refreshData}>
+          <BookingNavbar showActive={false} />
           {loading ? (
             <div className="flex flex-col items-center justify-center h-full">
               <Loader className="animate-spin slow-spin" />

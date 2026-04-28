@@ -1,6 +1,6 @@
 {
-  "name": "user-frontend",
-  "short_name": "user-frontend",
+  "name": "mistri-frontend",
+  "short_name": "mistri-frontend",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

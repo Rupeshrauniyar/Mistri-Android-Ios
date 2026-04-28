@@ -1,20 +1,39 @@
-import React, {useEffect, useState, useContext, useRef} from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
-import {AuthContext} from "../context/Auth.context";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {MapContainer, TileLayer, Marker, Popup, Polyline, useMap} from "react-leaflet";
+import { AuthContext } from "../context/Auth.context";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import {io} from "socket.io-client";
-import {Geolocation} from "@capacitor/geolocation";
-import {Loader2, MapPin, Phone, Calendar, Clock, IndianRupee, Navigation, User, CheckCircle, RefreshCcw, Loader} from "lucide-react";
+import { io } from "socket.io-client";
+import { Geolocation } from "@capacitor/geolocation";
+import {
+  Loader2,
+  MapPin,
+  Phone,
+  Calendar,
+  Clock,
+  IndianRupee,
+  Navigation,
+  User,
+  CheckCircle,
+  RefreshCcw,
+  Loader,
+} from "lucide-react";
 import BookingNavbar from "./BookingNavbar";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const socket = io.connect(backendUrl);
 
 // Component to handle map center updates
-const MapUpdater = ({center}) => {
+const MapUpdater = ({ center }) => {
   const map = useMap();
   useEffect(() => {
     if (center[0] !== 0 && center[1] !== 0) {
@@ -24,8 +43,8 @@ const MapUpdater = ({center}) => {
   return null;
 };
 
-const AcceptedOrder = ({acceptedOrder: order}) => {
-  const {user} = useContext(AuthContext);
+const AcceptedOrder = ({ acceptedOrder }) => {
+  const { mistri, token } = useContext(AuthContext);
   const [userPosition, setUserPosition] = useState([0, 0]);
   const [mistriPosition, setMistriPosition] = useState([0, 0]);
   const [positionLoading, setPositionLoading] = useState(true);
@@ -34,6 +53,8 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   const [permissionStatus, setPermissionStatus] = useState(null);
   const watchIdRef = useRef(null);
   const [otp, setOtp] = useState();
+  const [order, setOrder] = useState(acceptedOrder);
+  const [loading, setLoading] = useState(false);
   // Function for mobile devices using Capacitor
 
   const getMobileLocation = async () => {
@@ -64,18 +85,18 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
             //           setPositionLoading(false);
             return;
           }
-          const {latitude, longitude} = position.coords;
+          const { latitude, longitude } = position.coords;
           setMistriPosition([latitude, longitude]);
           setPositionLoading(false);
           setError(null);
-        }
+        },
       );
 
       watchIdRef.current = watchId;
 
       return () => {
         if (watchIdRef.current) {
-          Geolocation.clearWatch({id: watchIdRef.current});
+          Geolocation.clearWatch({ id: watchIdRef.current });
         }
       };
     } catch (err) {
@@ -99,7 +120,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
     try {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
-          const {latitude, longitude} = position.coords;
+          const { latitude, longitude } = position.coords;
           setMistriPosition([latitude, longitude]);
           setPositionLoading(false);
           setError(null);
@@ -110,7 +131,8 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
 
           switch (err.code) {
             case 1:
-              errorMessage = "Location access denied. Please enable location services.";
+              errorMessage =
+                "Location access denied. Please enable location services.";
               break;
             case 2:
               errorMessage = "Location unavailable. Please try again.";
@@ -127,7 +149,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
           enableHighAccuracy: true,
           timeout: 5000,
           maximumAge: 0,
-        }
+        },
       );
 
       watchIdRef.current = watchId;
@@ -146,6 +168,9 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
 
   // Initialize location tracking
   useEffect(() => {
+    if (order.status !== "accepted") {
+      return;
+    }
     getWebLocation();
     // getMobileLocation();
   }, []);
@@ -158,10 +183,9 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
     // getMobileLocation();
   };
 
-  // Socket connection effect
-  useEffect(() => {
+  const LocationFunction = () => {
     if (!error && mistriPosition[0] !== 0 && mistriPosition[1] !== 0) {
-      socket.emit("joinRoom", {room: order._id, userId: order.mistri});
+      socket.emit("joinRoom", { room: order._id, userId: order.mistri });
 
       socket.on("joinedRoom", () => {
         const Data = {
@@ -172,7 +196,11 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       });
 
       socket.on("receive-location", (Data) => {
-        if (Data.userPosition && (Data.userPosition[0] !== userPosition[0] || Data.userPosition[1] !== userPosition[1])) {
+        if (
+          Data.userPosition &&
+          (Data.userPosition[0] !== userPosition[0] ||
+            Data.userPosition[1] !== userPosition[1])
+        ) {
           setUserPosition(Data.userPosition);
           setUserPositionLoading(false);
         }
@@ -184,15 +212,23 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       };
     } else {
     }
+  };
+  // Socket connection effect
+  useEffect(() => {
+    if (order.status !== "accepted") {
+      return;
+    }
+    LocationFunction();
   }, [mistriPosition, error, order._id, order.user._id]);
 
   const userMarker = new L.Icon({
     iconUrl:
-      "https://imgs.search.brave.com/ApJIYKDK7IGJuNPMwxqzH5HiB2K7pM7QJC2EpHmkqoU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wbHVz/cG5nLmNvbS9pbWct/cG5nL3BuZy1sb2Nh/dGlvbi1maWxlLWxv/Y2F0aW9uLWljb24t/cG5nLTI4Ny5wbmc",
-    iconSize: [20, 30],
+      "https://imgs.search.brave.com/V5RsgQflza_ZfShkct9425UVXX7H07f3hbcJ8f3IuAU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMjAv/OTk1LzM3MC9zbWFs/bC8zZC1yZWQtbWFw/LXBpbi1wbmcucG5n",
+    iconSize: [30, 30],
   });
   const mistriMarker = new L.Icon({
-    iconUrl: "https://pluspng.com/img-png/png-location-location-black-png-image-4231-1200.png",
+    iconUrl:
+      "https://pluspng.com/img-png/png-location-location-black-png-image-4231-1200.png",
     iconSize: [35, 40],
   });
   const polylinePoints = [userPosition, mistriPosition];
@@ -211,12 +247,17 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   };
 
   const renderMap = () => {
+    if (order.status !== "accepted") {
+      return;
+    }
     if (positionLoading) {
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <Loader className="animate-spin slow-spin" />
 
-          <p className="text-gray-600 dark:text-white">Getting your location...</p>
+          <p className="text-gray-600 dark:text-white">
+            Getting your location...
+          </p>
         </div>
       );
     }
@@ -226,11 +267,14 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
           <MapPin className="w-12 h-12 text-gray-400" />
           <div className="text-center px-4">
             <p className="text-gray-600 dark:text-white mb-4">
-              {error === "Location permission denied" ? "Please enable location access to track the service professional" : "Unable to access your location"}
+              {error === "Location permission denied"
+                ? "Please enable location access to track the service professional"
+                : "Unable to access your location"}
             </p>
             <Button
               onClick={handleRetryLocation}
-              className="bg-black hover:bg-gray-800 text-white flex items-center space-x-2">
+              className="bg-black hover:bg-gray-800 text-white flex items-center space-x-2"
+            >
               <RefreshCcw className="w-4 h-4" />
               <span>Enable Location Access</span>
             </Button>
@@ -243,21 +287,18 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       <MapContainer
         center={mistriPosition}
         zoom={16}
-        className="w-full h-full z-20 rounded-t-2xl">
+        className="w-full h-full z-20 rounded-t-2xl"
+      >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Marker
-          icon={userMarker}
-          position={mistriPosition}>
+        <Marker icon={userMarker} position={mistriPosition}>
           <Popup>Your location</Popup>
         </Marker>
         {!userPositionLoading && userPosition[0] && userPosition[1] && (
           <>
-            <Marker
-              icon={mistriMarker}
-              position={userPosition}>
+            <Marker icon={mistriMarker} position={userPosition}>
               <Popup>{order.user.username}'s Location</Popup>
             </Marker>
             <Polyline
@@ -278,13 +319,55 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       setOtp(Data);
     }
   };
+
+  const VerifyOrder = async (OrderId) => {
+    setLoading(true);
+    try {
+      const Data = {
+        orderId: OrderId,
+        otp: otp,
+      };
+      const response = await axios.post(
+        `${backendUrl}/mistri/orders/verify`,
+        Data,
+        {
+          headers: {
+            authorization: `${token}`,
+          },
+        },
+      );
+      if (
+        response?.data.status === "OK" &&
+        response?.data.orderStatus === "verified"
+      ) {
+        setOrder((prev) => ({ ...prev, status: "working" }));
+        setLoading(false);
+      } else {
+        alert(response?.data.message);
+        setLoading(false);
+      }
+    } catch (error) {
+      // console.log(error);
+      setLoading(false);
+      // alert(error);
+    }
+  };
   return (
     <div className="w-full mt-4 overflow-hidden sm:px-2 xl:px-3 pb-[200px] ">
       <BookingNavbar />
 
       <div className="w-full  rounded-2xl overflow-hidden shadow-md dark:bg-zinc-900 bg-white">
         {/* Map Section */}
-        <div className="w-full h-[40vh] sm:h-[50vh] relative overflow-hidden">{renderMap()}</div>
+        {/* {console.log(order.status)} */}
+        {order.status === "verified" ? (
+          <></>
+        ) : order.status === "accepted" ? (
+          <div className="w-full h-[40vh] sm:h-[50vh] relative overflow-hidden">
+            {renderMap()}
+          </div>
+        ) : (
+          <></>
+        )}
 
         {/* Professional Info Card */}
         <div className="p-4 border-b">
@@ -293,7 +376,9 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
               <User className="w-8 h-8 text-gray-500" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-gray-900">{order.user.username}</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                {order.user.username}
+              </h2>
               {/* <p className="text-gray-600 dark:text-white">{order.user.profession}</p> */}
             </div>
             <div className="text-right">
@@ -309,8 +394,14 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         <div className="p-4 space-y-4">
           {/* Status */}
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-white">Order Status</span>
-            <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}>{order.status}</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-white">
+              Order Status
+            </span>
+            <span
+              className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}
+            >
+              {order.status}
+            </span>
           </div>
 
           {/* Time and Location */}
@@ -334,27 +425,51 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
           </div>
 
           {/* OTP Section */}
-          <div className="bg-gray-50 dark:bg-zinc-800 dark:text-white p-4 rounded-md">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-white">Service OTP</label>
-              <CheckCircle className="w-5 h-5 text-green-500" />
-            </div>
-            <Input
-              type="number"
-              className="text-center font-mono text-2xl tracking-wider dark:bg-black  border-0 text-green-800"
-              onChange={(e) => HandleOtp(e.target.value)}
-              value={otp}
-            />
-            <div className="w-full flex items-center justify-center mt-2">
-              <Button
-                disabled={otp?.length !== 6}
-                className="text-center">
-                Verify
-              </Button>
-            </div>
 
-            <p className="text-xs text-gray-500 text-center mt-2">Enter the OTP when you arrive</p>
-          </div>
+          {order.status === "working" ? (
+            <div className="bg-gray-50 dark:bg-zinc-800 dark:text-white p-4 rounded-md flex text-center items-center justify-center flex-col">
+              <p className="text-xs text-gray-500 text-center mt-2 flex text-center items-center justify-center">
+                Order Verified{" "}
+                <CheckCircle className="w-5 h-5 ml-2 text-green-500" />
+              </p>
+
+              <p className="text-xs text-gray-500 text-center mt-2">
+                Complete the order to get paid.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-gray-50 dark:bg-zinc-800 dark:text-white p-4 rounded-md">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-white">
+                  Service OTP
+                </label>
+                <CheckCircle className="w-5 h-5 text-green-500" />
+              </div>
+              <Input
+                type="number"
+                className="text-center font-mono text-2xl tracking-wider dark:bg-black  border-0 text-green-800"
+                onChange={(e) => HandleOtp(e.target.value)}
+                value={otp}
+              />
+              <div className="w-full flex items-center justify-center mt-2">
+                <Button
+                  disabled={otp?.length !== 6 || loading}
+                  onClick={() => VerifyOrder(order._id)}
+                  className={`text-center px-10 ${loading ? "bg-gray-400 " : "bg-black"}`}
+                >
+                  {loading ? (
+                    <Loader className="animate-spin slow-spin " />
+                  ) : (
+                    "Verify"
+                  )}
+                </Button>
+              </div>
+
+              <p className="text-xs text-gray-500 text-center mt-2">
+                Enter the OTP when you arrive
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

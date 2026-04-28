@@ -6,6 +6,8 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [mistri, setMistri] = useState(localStorage.getItem("mistri")?._id ? localStorage.getItem("mistri") : null);
+  const [token, setToken] = useState(localStorage.getItem("token") ? localStorage.getItem("token") : null);
+
   const [mistriLoading, setMistriLoading] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [lastOnlineCheck, setLastOnlineCheck] = useState(null);
@@ -39,9 +41,10 @@ export const AuthProvider = ({children}) => {
 
   // Initialize mistri from localStorage
   useEffect(() => {
-    const {localMistri} = getLocalData();
+    const {localMistri, token} = getLocalData();
     if (localMistri) {
       setMistri(localMistri);
+      setToken(token);
       setMistriLoading(false);
     }
   }, []);
@@ -60,6 +63,7 @@ export const AuthProvider = ({children}) => {
     if (isOffline) {
       if (localMistri) {
         setMistri(localMistri);
+        setToken(token);
       }
       setMistriLoading(false);
       return;
@@ -126,6 +130,7 @@ export const AuthProvider = ({children}) => {
     <AuthContext.Provider
       value={{
         mistri,
+        token,
         setMistri,
         mistriLoading,
         setMistriLoading,

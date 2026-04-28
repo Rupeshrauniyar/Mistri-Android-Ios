@@ -5,7 +5,7 @@ import axios from "axios";
 
 import {Link, useNavigate} from "react-router-dom";
 import {AuthContext} from "../context/Auth.context";
-import {Loader2, Upload} from "lucide-react";
+import {Loader2} from "lucide-react";
 
 const MistriRegister = () => {
   const {setMistri} = useContext(AuthContext);
@@ -22,8 +22,6 @@ const MistriRegister = () => {
     contactNumber: "",
     profession: "",
     charges: "",
-    profileImage: "",
-    idProof: "",
   });
 
   const [formData, setFormData] = useState({
@@ -36,10 +34,6 @@ const MistriRegister = () => {
     charges: "",
   });
 
-  const [profileImage, setProfileImage] = useState(null);
-  const [idProof, setIdProof] = useState(null);
-  const [displayIdProofImage, setDisplayIdProofImage] = useState(null);
-  const [displayProfileImage, setDisplayProfileImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   // Clean up when component unmounts
@@ -59,8 +53,6 @@ const MistriRegister = () => {
       contactNumber: "",
       profession: "",
       charges: "",
-      profileImage: "",
-      idProof: "",
     };
 
     // Email validation
@@ -108,54 +100,8 @@ const MistriRegister = () => {
       isValid = false;
     }
 
-    // File validation
-    if (!profileImage) {
-      newFieldErrors.profileImage = "Profile image is required";
-      isValid = false;
-    }
-
-    if (!idProof) {
-      newFieldErrors.idProof = "ID proof is required";
-      isValid = false;
-    }
-
     setFieldErrors(newFieldErrors);
     return isValid;
-  };
-
-  const idProofFnc = (idProofFile) => {
-    setIdProof(idProofFile);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setDisplayIdProofImage(reader.result);
-    };
-
-    reader.readAsDataURL(idProofFile);
-
-    // Clear error when file is selected
-    if (fieldErrors.idProof) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        idProof: "",
-      }));
-    }
-  };
-
-  const profileImageFnc = (profileImageFile) => {
-    setProfileImage(profileImageFile);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setDisplayProfileImage(reader.result);
-    };
-    reader.readAsDataURL(profileImageFile);
-
-    // Clear error when file is selected
-    if (fieldErrors.profileImage) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        profileImage: "",
-      }));
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -170,8 +116,6 @@ const MistriRegister = () => {
     for (const key in formData) {
       submitFormData.append(key, formData[key]);
     }
-    submitFormData.append("profileImage", profileImage);
-    submitFormData.append("idProof", idProof);
 
     setLoading(true);
     try {
@@ -513,72 +457,6 @@ const MistriRegister = () => {
                   {fieldErrors[field.name] && <p className="mt-1 text-sm text-red-600">{fieldErrors[field.name]}</p>}
                 </div>
               ))}
-            </div>
-
-            <div className="space-y-6 mt-6">
-              <div>
-                <label className="block text-sm font-medium dark:text-white text-gray-700 mb-2">ID Proof</label>
-                <div
-                  onClick={() => document.getElementById("idProof").click()}
-                  className={`cursor-pointer border-2 border-dashed ${
-                    fieldErrors.idProof ? "border-red-500" : displayIdProofImage ? "border-gray-300" : "border-gray-300 hover:border-gray-400"
-                  } dark:border-gray-700 rounded-xl p-4 transition-all duration-200 flex flex-col items-center justify-center h-48`}>
-                  {displayIdProofImage ? (
-                    <img
-                      src={displayIdProofImage || "/placeholder.svg"}
-                      alt="ID Proof"
-                      className="h-full max-h-40 object-contain"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to upload your ID proof</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Supported formats: JPG, PNG, PDF</p>
-                    </div>
-                  )}
-                  <input
-                    id="idProof"
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => idProofFnc(e.target.files[0])}
-                    accept="image/*,.pdf"
-                    disabled={loading || isRedirecting}
-                  />
-                </div>
-                {fieldErrors.idProof && <p className="mt-1 text-sm text-red-600">{fieldErrors.idProof}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium dark:text-white text-gray-700 mb-2">Profile Image</label>
-                <div
-                  onClick={() => document.getElementById("profileImage").click()}
-                  className={`cursor-pointer border-2 border-dashed ${
-                    fieldErrors.profileImage ? "border-red-500" : displayProfileImage ? "border-gray-300" : "border-gray-300 hover:border-gray-400"
-                  } dark:border-gray-700 rounded-xl p-4 transition-all duration-200 flex flex-col items-center justify-center h-48`}>
-                  {displayProfileImage ? (
-                    <img
-                      src={displayProfileImage || "/placeholder.svg"}
-                      alt="Profile"
-                      className="h-full max-h-40 object-contain"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to upload your profile image</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Supported formats: JPG, PNG</p>
-                    </div>
-                  )}
-                  <input
-                    id="profileImage"
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => profileImageFnc(e.target.files[0])}
-                    accept="image/*"
-                    disabled={loading || isRedirecting}
-                  />
-                </div>
-                {fieldErrors.profileImage && <p className="mt-1 text-sm text-red-600">{fieldErrors.profileImage}</p>}
-              </div>
             </div>
 
             <div className="flex items-center justify-between pt-4">

@@ -4,6 +4,7 @@ import {Button} from "@/components/ui/button";
 import {Link} from "react-router-dom";
 import {User, Mail, Phone, MapPin, Clock, CheckCircle, XCircle, History, LogOut, Settings, Pen} from "lucide-react";
 import SimplePullToRefresh from "@/components/SimplePullToRefresh";
+import { formatDistanceToNow } from "date-fns";
 
 const MistriProfile = () => {
   const {mistri, CheckMistri, mistriLoading} = useContext(AuthContext);
@@ -15,7 +16,10 @@ const MistriProfile = () => {
       </div>
     );
   }
-
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return formatDistanceToNow(date, {addSuffix: true});
+  };
   // Calculate order statistics
   const totalOrders = mistri?.acceptedOrder?.length + mistri?.rejectedOrders?.length || 0;
   const pendingOrders = mistri?.orders?.filter((order) => order.status === "pending").length || 0;
@@ -44,13 +48,13 @@ const MistriProfile = () => {
           <div className="bg-white dark:bg-zinc-900  rounded-xl shadow-sm p-6 mb-6">
             <div className="w-full flex items-center justify-between">
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold">
+                <div className="w-20  h-20 bg-black text-white rounded-full flex items-center justify-center text-2xl font-bold">
                   {mistri.mistriname?.charAt(0).toUpperCase()}
                 </div>
 
                 <div>
-                  <h2 className="text-2xl font-bold">{mistri.mistriname}</h2>
-                  <p className="text-gray-500">Member since {new Date(mistri.createdAt).toLocaleDateString()}</p>
+                  <h2 className="w-[200px] text-2xl font-bold truncate text-ellipsis">{mistri.mistriname}</h2>
+                  <p className="text-gray-500">Joined {formatDate(mistri.createdAt)}</p>
                 </div>
               </div>
 
@@ -100,19 +104,7 @@ const MistriProfile = () => {
           </div>
 
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="bg-white dark:bg-zinc-900  rounded-xl shadow-sm p-4">
-                <div className={`w-10 h-10 ${stat.color} rounded-full flex items-center justify-center mb-3`}>
-                  <stat.icon size={20} />
-                </div>
-                <h3 className="text-lg font-semibold truncate">{stat.label}</h3>
-                <p className="text-2xl font-bold">{stat.value}</p>
-              </div>
-            ))}
-          </div>
+         
 
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-4">

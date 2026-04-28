@@ -34,7 +34,7 @@ const orderSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'accepted', 'working', 'completed', 'cancelled'],
+        enum: ['pending', 'accepted', 'working', 'completed', 'cancelled', "verified"],
         default: 'pending'
     },
     orderTime: {
@@ -47,11 +47,11 @@ const orderSchema = mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now 
+        default: Date.now
     },
     updatedAt: {
         type: Date,
-        default: Date.now 
+        default: Date.now
     },
     profession: {
         type: String,

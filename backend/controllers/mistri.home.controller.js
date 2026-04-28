@@ -101,7 +101,7 @@ const fetchOrders = async (req, res) => {
     const Data = req.body
     try {
         if (Data) {
-            const orders = await orderModel.find({ mistri: Data.id }).select("-otp -mistri").populate({
+            const orders = await orderModel.find({ mistri: Data.id, status: "pending" }).select("-otp -mistri").populate({
                 path: "user",
                 select: "-email -password -contactNumber -orders -acceptedOrder -history -favourites "
 

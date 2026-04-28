@@ -9,7 +9,7 @@ const Navbar = () => {
   const {user} = useContext(userContext);
 
   useEffect(() => {
-    setActiveTab(location.pathname);
+    setActiveTab(location.pathname === "/bookings/other" ? "/bookings" : location.pathname === "/bookings/history" ? "/bookings" : location.pathname);
   }, [location]);
 
   const navLinks = [
@@ -97,6 +97,7 @@ const Navbar = () => {
                   flex flex-col items-center justify-center relative
                   ${activeTab === navLink.path ? "text-black" : "text-gray-500"}
                 `}>
+                {console.log(navLink.path, activeTab)}
                 <navLink.icon
                   className={`
                   w-5 h-5 transition-all duration-200

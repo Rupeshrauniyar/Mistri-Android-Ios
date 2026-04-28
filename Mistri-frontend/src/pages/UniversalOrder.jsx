@@ -63,7 +63,6 @@ const UniversalOrder = () => {
             activeOrders: response.data.order,
           }));
         } else {
-
         }
       } catch (error) {
         console.error("Error fetching active orders:", error);
@@ -100,9 +99,9 @@ const UniversalOrder = () => {
   }, [fetched]);
 
   return (
-    <div className="UniversalOrder w-full h-full px-2 sm:pb-[150px]">
+    <div className="UniversalOrder w-full h-full  px-2 ">
       <SimplePullToRefresh onRefresh="">
-        <BookingNavbar showActive={false} />
+        <div className="w-full h-[10px]"></div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full ">
@@ -129,11 +128,9 @@ const UniversalOrder = () => {
             <div className="bg-gray-100 dark:bg-gray-700 p-4 sm:p-6 rounded-full mb-3 sm:mb-4">
               <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 text-center">No orders available</h3>
-            <p className="text-gray-600 dark:text-gray-300 text-center max-w-md text-sm sm:text-base">
-              There are currently no available orders matching your profession.
-            </p>
-            <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-2 text-center">Check back later or refresh to see new orders</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 text-center">No orders found.</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-center max-w-md text-sm sm:text-base">Accept the received order to see it here.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-2 text-center">Check back later or refresh.</p>
           </div>
         )}
       </SimplePullToRefresh>

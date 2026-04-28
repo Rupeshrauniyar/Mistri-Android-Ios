@@ -1,8 +1,9 @@
-const mongoose = require('mongoose')
-require('dotenv').config()
+const dns = require('dns');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-
-
+// Force public DNS resolvers so MongoDB SRV lookups work locally.
+dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 const DB = mongoose.connect(process.env.MONGODB_URI).then(function () {
     try {
@@ -10,7 +11,7 @@ const DB = mongoose.connect(process.env.MONGODB_URI).then(function () {
     } catch (err) {
         console.log(err)
     }
-})
+});
 
 
-module.exports = DB
+module.exports = DB;

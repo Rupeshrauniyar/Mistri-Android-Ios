@@ -19,9 +19,9 @@ const BookingNavbar = (props) => {
       length: () => universalOrder?.length || 0,
     },
     {
-      label: "Bookings",
-      path: "/bookings",
-      length: () => mistri?.orders?.filter((order) => order.status === "pending").length || 0,
+      label: "History",
+      path: "/bookings/history",
+      length: () => mistri?.history?.length || 0,
     },
   ];
   const RemoveBookingstabs = [
@@ -38,9 +38,9 @@ const BookingNavbar = (props) => {
       length: () => mistri?.orders?.filter((order) => order.status === "pending").length || 0,
     },
     {
-      label: "For you",
-      path: "/bookings/foryou",
-      length: () => universalOrder?.length || 0,
+      label: "History",
+      path: "/bookings/history",
+      length: () => mistri?.history?.length || 0,
     },
   ];
 

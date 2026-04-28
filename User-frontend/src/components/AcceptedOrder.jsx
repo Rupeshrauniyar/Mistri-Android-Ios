@@ -8,7 +8,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import {io} from "socket.io-client";
 import {Geolocation} from "@capacitor/geolocation";
-import {Loader2, MapPin, Phone, Calendar, Clock, IndianRupee, Navigation, User, CheckCircle, RefreshCcw} from "lucide-react";
+import {Loader, MapPin, Phone, Calendar, Clock, IndianRupee, Navigation, User, CheckCircle, RefreshCcw} from "lucide-react";
 import {ActiveOrdersContext} from "@/context/ActiveOrders.context";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const socket = io.connect(backendUrl);
@@ -34,9 +34,9 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   const [permissionStatus, setPermissionStatus] = useState(null);
   const watchIdRef = useRef(null);
   const {activeOrders, seActiveOrdersContext} = useContext(ActiveOrdersContext);
+  const [status, setStatus] = useState(order.status);
 
   // Function for mobile devices using Capacitor
-
   const getMobileLocation = async () => {
     try {
       // Check permissions first
@@ -47,7 +47,6 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         const requestPermission = await Geolocation.requestPermissions();
         if (requestPermission.location !== "granted") {
           setError("Location permission denied");
-          //         setPositionLoading(false);
           return;
         }
       }
@@ -62,7 +61,6 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         (position, err) => {
           if (err) {
             setError("Error fetching geolocation");
-            //           setPositionLoading(false);
             return;
           }
           const {latitude, longitude} = position.coords;
@@ -80,10 +78,12 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
         }
       };
     } catch (err) {
-      console.error("Error in mobile location:", err);
-      setError("Failed to access location services");
-      //     setPositionLoading(false);
-      alert(err);
+      const requestPermission = await Geolocation.requestPermissions();
+      if (requestPermission.location !== "granted") {
+        setError("Location permission denied");
+        alert("Please enable your location.");
+      }
+      return;
     }
   };
 
@@ -104,7 +104,6 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
           setError(null);
         },
         (err) => {
-          // console.error("Geolocation Error:", err);
           let errorMessage = "Error accessing location";
 
           switch (err.code) {
@@ -145,21 +144,23 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
 
   // Initialize location tracking
   useEffect(() => {
-    getWebLocation();
-    // getMobileLocation();
-  }, []);
+    if (status !== "completed" && status !== "cancelled") {
+      getWebLocation();
+      // getMobileLocation(); // Uncomment for mobile usage
+    }
+  }, [status]);
 
   // Handle retry location access
   const handleRetryLocation = async () => {
     setPositionLoading(true);
     setError(null);
     getWebLocation();
-    // getMobileLocation();
+    // getMobileLocation(); // Uncomment for mobile usage
   };
 
   // Socket connection effect
   useEffect(() => {
-    if (!error && userPosition[0] !== 0 && userPosition[1] !== 0) {
+    if (!error && userPosition[0] !== 0 && userPosition[1] !== 0 && status !== "completed" && status !== "cancelled") {
       socket.emit("joinRoom", {room: order._id, userId: order.user._id});
 
       socket.on("joinedRoom", () => {
@@ -171,33 +172,46 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
       });
 
       socket.on("receive-location", (Data) => {
-
         if (Data.mistriPosition && (Data.mistriPosition[0] !== mistriPosition[0] || Data.mistriPosition[1] !== mistriPosition[1])) {
           setMistriPosition(Data.mistriPosition);
           setMistriPositionLoading(false);
         }
       });
 
+      socket.on("order-status-updated", (data) => {
+        if (data.orderId === order._id && data.status) {
+          setStatus(data.status);
+        }
+      });
+
       return () => {
         socket.off("joinedRoom");
         socket.off("receive-location");
+        socket.off("order-status-updated");
       };
     }
-  }, [userPosition, error, order._id, order.user._id]);
+  }, [userPosition, error, order._id, order.user._id, status]);
 
   const userMarker = new L.Icon({
     iconUrl:
-      "https://imgs.search.brave.com/ApJIYKDK7IGJuNPMwxqzH5HiB2K7pM7QJC2EpHmkqoU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wbHVz/cG5nLmNvbS9pbWct/cG5nL3BuZy1sb2Nh/dGlvbi1maWxlLWxv/Y2F0aW9uLWljb24t/cG5nLTI4Ny5wbmc",
-    iconSize: [20, 30],
+      "https://imgs.search.brave.com/V5RsgQflza_ZfShkct9425UVXX7H07f3hbcJ8f3IuAU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wMjAv/OTk1LzM3MC9zbWFs/bC8zZC1yZWQtbWFw/LXBpbi1wbmcucG5n",
+    iconSize: [30, 30],
   });
+  
   const mistriMarker = new L.Icon({
     iconUrl: "https://pluspng.com/img-png/png-location-location-black-png-image-4231-1200.png",
     iconSize: [35, 40],
   });
+  
   const polylinePoints = [userPosition, mistriPosition];
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
+      case "accepted":
+        return "bg-blue-100 text-blue-800";
+      case "working":
+      case "verified":
+        return "bg-purple-100 text-purple-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "completed":
@@ -210,14 +224,28 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
   };
 
   const renderMap = () => {
+    if (status === "completed" || status === "cancelled") {
+      return (
+        <div className="flex flex-col items-center justify-center h-full bg-gray-50 dark:bg-zinc-800 dark:text-white space-y-4 rounded-t-2xl">
+          <CheckCircle className="w-12 h-12 text-green-500" />
+          <div className="text-center px-4">
+            <p className="text-gray-600 dark:text-white mb-2">
+              {status === "completed" ? "Service completed successfully!" : "This service was cancelled"}
+            </p>
+          </div>
+        </div>
+      );
+    }
+    
     if (positionLoading) {
       return (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
-          <Loader2 className="w-10 h-10 text-black animate-spin" />
+          <Loader className="animate-spin slow-spin" />
           <p className="text-gray-600 dark:text-white">Getting your location...</p>
         </div>
       );
     }
+    
     if (error || !userPosition) {
       return (
         <div className="flex flex-col items-center justify-center h-full bg-gray-50 dark:bg-zinc-800 dark:text-white space-y-4 rounded-t-2xl">
@@ -266,13 +294,14 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
             />
           </>
         )}
+        <MapUpdater center={userPosition} />
       </MapContainer>
     );
   };
 
   return (
-    <div className="w-full mt-4 overflow-hidden px-4 pb-[150px] ">
-      <div className="w-full  rounded-2xl overflow-hidden shadow-md dark:bg-zinc-900 bg-white">
+    <div className="w-full mt-4 overflow-hidden px-4 pb-[150px]">
+      <div className="w-full rounded-2xl overflow-hidden shadow-md dark:bg-zinc-900 bg-white">
         {/* Map Section */}
         <div className="w-full h-[40vh] sm:h-[50vh] relative overflow-hidden">{renderMap()}</div>
 
@@ -283,7 +312,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
               <User className="w-8 h-8 text-gray-500" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-gray-900">{order.mistri.mistriname}</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{order.mistri.mistriname}</h2>
               <p className="text-gray-600 dark:text-white">{order.mistri.profession}</p>
             </div>
             <div className="text-right">
@@ -300,7 +329,7 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
           {/* Status */}
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700 dark:text-white">Order Status</span>
-            <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}>{order.status}</span>
+            <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(status)}`}>{status}</span>
           </div>
 
           {/* Time and Location */}
@@ -335,10 +364,16 @@ const AcceptedOrder = ({acceptedOrder: order}) => {
             </div>
             <Input
               disabled
-              className="text-center font-mono text-2xl tracking-wider dark:bg-black  border-0 text-green-800"
+              className="text-center font-mono text-2xl tracking-wider dark:bg-black border-0 text-green-800"
               value={order.otp}
             />
-            <p className="text-xs text-gray-500 text-center mt-2">Share this OTP with the professional when they arrive</p>
+            {status === "completed" ? (
+              <p className="text-xs text-green-500 text-center mt-2">Service completed successfully!</p>
+            ) : status === "working" || status === "verified" ? (
+              <p className="text-xs text-purple-500 text-center mt-2">Service in progress...</p>
+            ) : (
+              <p className="text-xs text-gray-500 text-center mt-2">Share this OTP with the professional when they arrive</p>
+            )}
           </div>
         </div>
       </div>

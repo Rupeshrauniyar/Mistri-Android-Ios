@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from "react";
 import {NavLink, useLocation} from "react-router-dom";
-import {Home, History, PlusCircle, Book, User, LogOut, Settings,LayoutDashboard} from "lucide-react";
+import {Home, History, PlusCircle, Book, User, LogOut, Settings, LayoutDashboard} from "lucide-react";
 import {AuthContext} from "../context/Auth.context";
 
 const Navbar = () => {
@@ -9,7 +9,7 @@ const Navbar = () => {
   const {user} = useContext(AuthContext);
 
   useEffect(() => {
-    setActiveTab(location.pathname);
+    setActiveTab(location.pathname === "/bookings/history" ? "/bookings" : location.pathname);
   }, [location]);
 
   const navLinks = [
@@ -19,11 +19,11 @@ const Navbar = () => {
       icon: Home,
     },
     {
-      path: "/history",
-      name: "History",
+      path: "/foryou",
+      name: "Foryou",
       icon: History,
     },
-    
+
     {
       path: "/bookings",
       name: "Bookings",
@@ -86,34 +86,21 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="xl:hidden fixed bottom-0 left-0 right-0 dark:bg-zinc-900 dark:text-white text-black shadow-md  bg-white z-[999]">
-        <div className="flex justify-around items-center h-16 px-2 shadow-md ">
+      <div className="xl:hidden fixed bottom-0 left-0 right-0 dark:bg-zinc-900 dark:text-white text-black shadow-md bg-white z-[999]">
+        <div className="flex justify-around items-center sm:px-4 h-16 origin-left shadow-md flex-wrap min-w-0">
           {navLinks.map((navLink, index) => (
             <NavLink
               key={index}
               to={navLink.path}
-              className="flex flex-col items-center justify-center px-4 py-2 rounded-md w-[80px]">
-              <div
-                className={`
-                  flex flex-col items-center justify-center relative
-                  ${activeTab === navLink.path ? "text-black" : "text-gray-500"}
-                `}>
-                <navLink.icon
-                  className={`
-                  w-5 h-5 transition-all duration-200
-                  ${activeTab === navLink.path ? "scale-110 text-white" : "scale-100"}
-                `}
-                />
+              className="flex-1 min-w-0 flex flex-col items-center justify-center px-1 py-2 rounded-md">
+              <div className={`flex flex-col items-center justify-center relative ${activeTab === navLink.path ? "text-black" : "text-gray-500"}`}>
+                <navLink.icon className={`w-5 h-5 transition-all duration-200 ${activeTab === navLink.path ? "scale-110 text-white" : "scale-100"}`} />
                 <span className={`text-xs font-medium ${activeTab === navLink.path ? "text-white" : "text-gray-500"}`}>{navLink.name}</span>
               </div>
             </NavLink>
           ))}
         </div>
       </div>
-
-     
-
-     
     </>
   );
 };

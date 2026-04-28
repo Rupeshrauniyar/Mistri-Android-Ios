@@ -6,12 +6,12 @@ const http = require("http");
 const socketio = require("socket.io");
 const server = http.createServer(app);
 require("dotenv").config();
-
+const dns = require("dns")
 
 app.use(cors());
 
 app.options('*', cors());
-
+  
 const io = socketio(server, {
     cors: ({})
 });

@@ -9,6 +9,8 @@ const isMistri = require("../middlewares/isMistri.js")
 router.get("/", isMistri, mistriOrderController.MistriSendOrderController)
 router.post("/accept", isMistri, mistriOrderController.MistriOrderAcceptController)
 router.post("/reject", isMistri, mistriOrderController.MistriOrderRejectController)
+router.post("/verify", isMistri, mistriOrderController.MistriOrderVerifyController)
+
 
 
 

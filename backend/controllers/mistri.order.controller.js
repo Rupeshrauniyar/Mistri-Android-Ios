@@ -53,17 +53,40 @@ const MistriSendOrderController = async (req, res) => {
         res.json({ message: "Server error.Please try again later." });
     }
 };
+const MistriOrderVerifyController = async (req, res) => {
+    try {
+        const token = req.headers["authorization"];
+        const Data = req.body
+        if (!token) {
+            return res.json({ message: "No token provided" });
+        }
+        const decoded = jwt.verify(token, process.env.JWT);
 
 
+        const mistriId = decoded.mistriId
+        if (mistriId) {
+            const order = await orderModel.findOne({ _id: Data.orderId })
 
-// // Usage example
-// generateSecureOTP(6)
-//     .then(({  hashedOTP }) => {
-//     })
-//     .catch(err => {
-//         console.error(err.message);
-//     });
+            if (order.mistri.toString() !== mistriId.toString()) {
+                return res.json({ message: "Unauthorized request", status: "BAD" })
+            }
+            const orderOtp = order.otp
+            const decryptOtp = jwt.verify(orderOtp, process.env.JWT)
+            if (decryptOtp === Data.otp) {
+                const updateOrder = await orderModel.findByIdAndUpdate(Data.orderId, { status: "working" }, { new: true })
 
+                return res.json({ message: "Order verified", status: "OK", orderStatus: "verified" })
+            } else {
+                return res.json({ message: "Invalid OTP", status: "BAD" })
+            }
+        } else {
+            return res.json({ message: "Invalid ID", status: "BAD" });
+        }
+    } catch (error) {
+        console.error(error);
+        res.json({ message: "Server error.Please try again later." });
+    }
+};
 const MistriOrderAcceptController = async (req, res) => {
     try {
         const Data = req.body
@@ -100,7 +123,7 @@ const MistriOrderAcceptController = async (req, res) => {
                     },
                     { new: true }
                 ).select("-password -contactName -role -email")
-                
+
                 res.json({ status: "OK", order, user, mistri, type: "universal" })
             } else {
 
@@ -166,4 +189,4 @@ const MistriOrderRejectController = async (req, res) => {
 
 
 
-module.exports = { MistriSendOrderController, MistriOrderAcceptController, MistriOrderRejectController }
+module.exports = { MistriSendOrderController, MistriOrderAcceptController, MistriOrderRejectController, MistriOrderVerifyController }

@@ -85,7 +85,7 @@ const registerController = async (req, res) => {
             return res.json({ status: "BAD", message: error.details[0].message });
         }
 
-        const { profileImage, idProof } = req.files;
+        // const { profileImage, idProof } = req.files;
         const { email, password, mistriname, contactNumber, address, profession, charges } = value;
 
         // Check for existing users
@@ -115,21 +115,21 @@ const registerController = async (req, res) => {
                 }
 
                 try {
-                    const uploadFile = async (file) => {
-                        if (!file || !file.length) {
-                            throw new Error("No file provided for upload");
-                        }
-                        const fileData = file[0];
-                        const metadata = {
-                            contentType: fileData.mimetype, // Set the correct MIME type
-                        };
-                        const fileRef = ref(storage, `files/${Date.now()}_${fileData.originalname}`);
-                        const snapshot = await uploadBytes(fileRef, fileData.buffer, metadata);
-                        return await getDownloadURL(snapshot.ref);
-                    };
+                    // const uploadFile = async (file) => {
+                    //     if (!file || !file.length) {
+                    //         throw new Error("No file provided for upload");
+                    //     }
+                    //     const fileData = file[0];
+                    //     const metadata = {
+                    //         contentType: fileData.mimetype, // Set the correct MIME type
+                    //     };
+                    //     const fileRef = ref(storage, `files/${Date.now()}_${fileData.originalname}`);
+                    //     const snapshot = await uploadBytes(fileRef, fileData.buffer, metadata);
+                    //     return await getDownloadURL(snapshot.ref);
+                    // };
 
-                    const profileImageURL = await uploadFile(profileImage);
-                    const idProofURL = await uploadFile(idProof);
+                    // const profileImageURL = await uploadFile(profileImage);
+                    // const idProofURL = await uploadFile(idProof);
 
                     // Create a new user
                     const newmistri = await mistriModel.create({
@@ -138,7 +138,7 @@ const registerController = async (req, res) => {
                         mistriname: mistriname,
                         contactNumber: contactNumber,
                         address,
-                        idProof: idProofURL,
+                        // idProof: idProofURL,
                         profileImage: "https://imgs.search.brave.com/oJmhCNRk22fQdZbu84cZUAGtfWey9UBMhi06dAXg6lw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9jcmVhdGUtcGlj/dHVyZS10aGF0LXJl/cHJlc2VudHMtZGl2/ZXJzZS10ZWFtLWNv/bnN0cnVjdGlvbi13/b3JrZXJzLXN1Z2dl/c3RpbmctY29sbGFi/b3JhdGl2ZS1lXzkz/OTAzMy0xMDI1NDYu/anBnP3NpemU9NjI2/JmV4dD1qcGc",
                         profession,
                         charges

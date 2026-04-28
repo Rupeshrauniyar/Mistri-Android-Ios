@@ -348,7 +348,7 @@ const Book = () => {
           </div>
 
           {/* Booking Button */}
-          <div className="fixed dark:bg-zinc-900 dark:text-white xl:bottom-0 right-0 sm:px-4 xl:w-[80%] sm:w-full sm:bottom-[55px] shadow-lg  z-50  md:px-0">
+          <div className="fixed dark:bg-zinc-900 dark:text-white xl:bottom-0 right-0 sm:px-4 xl:w-[83%] sm:w-full sm:bottom-[55px] shadow-lg  z-50  md:px-0">
             <div className=" ">
               <div className="bg-white dark:bg-zinc-900 dark:text-white border-t p-4 shadow-lg rounded-t-xl backdrop-blur-md bg-opacity-95">
                 {isAlreadyBooked ? (

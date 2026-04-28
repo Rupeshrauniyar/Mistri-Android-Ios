@@ -26,6 +26,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import AcceptedOrderComp from "./components/AcceptedOrdersComp.jsx";
 import AcceptedOrder from "./pages/AcceptedOrder.jsx";
 import {Package} from "lucide-react";
+import Dashboard from "./pages/Dashboard.jsx";
 
 function NewApp() {
   const {mistri, mistriLoading, theme, setTheme} = useContext(AuthContext);
@@ -77,7 +78,7 @@ function NewApp() {
         {showNavbars && <Navbar />}
         {showNavbars && <TopNavbar />}
 
-        <div className={`flex  flex-col ${showNavbars ? "xl:w-[85%] xl:ml-[17%] sm:w-full" : "w-full"} h-screen overflow-hidden`}>
+        <div className={`flex  flex-col ${showNavbars ? "xl:w-[85%] xl:ml-[18.7%] sm:w-full" : "w-full"} h-screen overflow-hidden`}>
           <div className={`   flex-1 ${showNavbars ? "mt-[65px]   " : ""} flex flex-col  min-h-screen`}>
             <div className="flex-1 flex flex-col overflow-y-auto ">
               <Routes>
@@ -92,7 +93,7 @@ function NewApp() {
                     element={<Booking />}
                   />
                   <Route
-                    path="/bookings/foryou"
+                    path="/foryou"
                     element={<UniversalOrder />}
                   />
                   <Route
@@ -100,7 +101,7 @@ function NewApp() {
                     element={<AcceptedOrder />}
                   />
                   <Route
-                    path="/history"
+                    path="/bookings/history"
                     element={<History />}
                   />
                   <Route
@@ -109,7 +110,7 @@ function NewApp() {
                   />
                   <Route
                     path="/dashboard"
-                    element={<MistriProfile />}
+                    element={<Dashboard />}
                   />
                 </Route>
 

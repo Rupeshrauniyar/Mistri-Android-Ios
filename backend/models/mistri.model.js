@@ -30,7 +30,7 @@ const mistriSchema = mongoose.Schema({
     },
     idProof: {
         type: String,
-        required: true
+        required: false
     },
     createdAt: {
         type: Date,
@@ -52,7 +52,7 @@ const mistriSchema = mongoose.Schema({
     },
     isVerified: {
         type: Boolean,
-        default: false
+        default: true
     },
     rejectedOrders: [{
         type: mongoose.Schema.Types.ObjectId,
